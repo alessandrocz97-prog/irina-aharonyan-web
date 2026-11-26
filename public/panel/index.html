@@ -473,10 +473,10 @@ dialog:has(.dlg--wide) { width: min(680px, calc(100vw - 28px)); }
     var s = S.status || {};
     function li(ok, title, text) { return '<li class="' + (ok ? 'done' : '') + '"><span class="dot">' + (ok ? '✓' : '') + '</span><div><b>' + title + '</b><p>' + text + '</p></div></li>'; }
     var canCreate = s.db && s.sessionSecret && s.setupOpen;
-    app.innerHTML = '<div class="wrap"><div class="center center--wide"><h1>Puesta en marcha</h1><p>El panel se activa cuando estos tres pasos están hechos. Los valores se escriben en Vercel, nunca aquí.</p>' +
+    app.innerHTML = '<div class="wrap"><div class="center center--wide"><h1>Puesta en marcha</h1><p>El panel se activa cuando estos pasos están hechos. Los valores se escriben en Vercel, nunca aquí.</p>' +
       '<div class="card"><ol class="steps">' +
       li(s.db, 'Base de datos conectada', s.db ? 'Conexión correcta.' : 'En Vercel, abra el proyecto → Storage → Create Database → Neon (Postgres) → región Frankfurt → Connect. Después, Redeploy.') +
-      li(s.sessionSecret, 'Clave de sesión', s.sessionSecret ? 'Configurada.' : 'Falta la variable <code>SESSION_SECRET</code> en el proyecto.') +
+      li(s.sessionSecret, 'Clave de sesión', s.sessionSecret ? 'Creada.' : 'No hay que hacer nada: el servidor crea la suya al conectar la base de datos.') +
       li(s.hasAccounts, 'Cuentas del panel', s.hasAccounts ? 'Hay al menos una cuenta.' :
         (s.setupOpen ? 'Cree abajo la primera cuenta con el código de alta.' : 'Añada en Vercel la variable <code>PANEL_SETUP_CODE</code> con un código que solo usted conozca (mínimo 8 caracteres) y haga Redeploy.')) +
       '</ol></div>' +

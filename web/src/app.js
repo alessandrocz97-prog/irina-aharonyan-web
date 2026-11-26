@@ -98,10 +98,20 @@
   /* ------------------------------------------------------------------
      Piezas comunes
   ------------------------------------------------------------------ */
+  /* Banderas del selector de idioma, simplificadas para leerse a 18 px de ancho */
+  var FLAGS = {
+    es: '<path fill="#AA151B" d="M0 0h30v20H0z"/><path fill="#F1BF00" d="M0 5h30v10H0z"/>',
+    va: '<path fill="#FCDD09" d="M0 0h30v20H0z"/><path fill="#DA121A" d="M8 2.220h22v2.220H8zm0 4.450h22v2.220H8zm0 4.440h22v2.220H8zm0 4.450h22v2.220H8z"/>' +
+      '<path fill="#0D5EAF" d="M0 0h6.200v20H0z"/><path fill="#DA121A" d="M6.200 0h1.800v20H6.200z"/><path fill="#FCDD09" d="M5.850 0h.7v20h-.7zM7.650 0h.7v20h-.7z"/>',
+    ru: '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#0039A6" d="M0 6.670h30v6.660H0z"/><path fill="#D52B1E" d="M0 13.330h30V20H0z"/>',
+    hy: '<path fill="#D90012" d="M0 0h30v20H0z"/><path fill="#0033A0" d="M0 6.670h30v6.660H0z"/><path fill="#F2A800" d="M0 13.330h30V20H0z"/>',
+    it: '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#009246" d="M0 0h10v20H0z"/><path fill="#CE2B37" d="M20 0h10v20H20z"/>'
+  };
   function langHTML(T) {
     return '<div class="lang" role="group" aria-label="' + T.nav.lang + '">' + SITE.langs.map(function (l) {
       return '<button type="button" data-lang="' + l + '" lang="' + tag(l) + '" title="' + SITE.langNames[l] +
-        '" aria-label="' + SITE.langNames[l] + '" aria-pressed="' + (state.lang === l) + '">' + l.toUpperCase() + '</button>';
+        '" aria-label="' + SITE.langNames[l] + '" aria-pressed="' + (state.lang === l) + '">' +
+        '<svg class="flag" viewBox="0 0 30 20" aria-hidden="true" focusable="false">' + FLAGS[l] + '</svg><span>' + l.toUpperCase() + '</span></button>';
     }).join('') + '</div>';
   }
 

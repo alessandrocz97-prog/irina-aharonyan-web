@@ -832,6 +832,32 @@ await test('el horario se guarda sin tocar el resto de los ajustes', async () =>
   await api('PUT', '/admin/settings', { schedule: before.schedule, minNoticeHours: before.minNoticeHours, maxDaysAhead: before.maxDaysAhead });
 });
 
+await test('sin SESSION_SECRET, el servidor crea su clave de sesión, la conserva y no la enseña', async () => {
+  const { sessionSecret, forgetSessionSecret } = await import('../lib/core.js');
+  const env = process.env.SESSION_SECRET, before = cookie;
+  delete process.env.SESSION_SECRET;
+  try {
+    const made = await sessionSecret();
+    assert.ok(made.length >= 48 && made !== env);
+    forgetSessionSecret();
+    assert.equal(await sessionSecret(), made);                 // tras un arranque en frío sale la misma, de la base de datos
+    assert.equal((await q('select count(*)::int as n from secrets')).rows[0].n, 1);
+    assert.equal((await api('GET', '/setup-status')).data.sessionSecret, true);
+    assert.equal((await api('GET', '/admin/me')).status, 401);    // la sesión firmada con la clave anterior deja de valer
+    const r = await api('POST', '/admin/login', { email: 'irina@example.com', password: 'otra-clave-bien-larga' }, { auth: false, ip: '10.7.7.7' });
+    assert.equal(r.status, 200);
+    cookie = r.res.headers.get('set-cookie').split(';')[0];
+    assert.equal((await api('GET', '/admin/me')).status, 200);
+    const s = await api('GET', '/admin/settings');
+    assert.ok(!JSON.stringify(s.data).includes(made));
+    const h = await book(addDays(monday, 14), '09:00', 991);     // el freno por IP de la web sigue funcionando
+    assert.equal(h.status, 201);
+  } finally {
+    process.env.SESSION_SECRET = env; forgetSessionSecret(); cookie = before;
+  }
+  assert.equal((await api('GET', '/admin/me')).status, 200);
+});
+
 await test('rutas desconocidas y cierre de sesión', async () => {
   assert.equal((await api('GET', '/nada')).status, 404);
   const out = await api('POST', '/admin/logout');

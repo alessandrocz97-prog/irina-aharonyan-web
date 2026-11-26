@@ -12,7 +12,7 @@ Web pública (5 idiomas: español, valenciano, ruso, armenio e italiano), motor 
 | `lib/invoice-pdf.js`, `lib/fonts/` | La factura en PDF con el estilo de la web (fuentes con licencia abierta) |
 | `lib/verifactu.js` | La conexión con VERI*FACTU: registro de cada factura en la AEAT a través de Verifacti |
 | `vercel.json`, `package.json` | Configuración de Vercel (región Fráncfort, Node 22) |
-| `test/` | 60 pruebas automáticas (`npm install && node test/run.mjs`) |
+| `test/` | 61 pruebas automáticas (`npm install && node test/run.mjs`) |
 | `dev/` | Servidor local de pruebas con datos de ejemplo (`node dev/server.mjs`) |
 | `web/` | Fuente de la web pública: textos por idioma (`web/src/content/`), estilos, imágenes y `web/build.py`, que regenera `public/index.html` |
 
@@ -22,7 +22,7 @@ Los valores secretos se escriben en Vercel (Project → Settings → Environment
 
 1. **Proyecto en Vercel.** Importar este repositorio como proyecto nuevo. Sin framework; no hay que tocar ningún ajuste de compilación.
 2. **Base de datos.** En el proyecto: Storage → Create Database → Neon (Postgres) → región Frankfurt → Connect. Vercel añade sola la variable `DATABASE_URL`. Las tablas se crean solas en el primer uso.
-3. **Clave de sesión.** Variable `SESSION_SECRET`: una cadena aleatoria de 32 caracteres o más.
+3. **Clave de sesión.** No hay que hacer nada: el servidor crea la suya al conectar la base de datos y la guarda en ella. Quien prefiera fijarla a mano puede definir la variable `SESSION_SECRET` (cadena aleatoria de 32 caracteres o más), que tiene preferencia.
 4. **Código de alta.** Variable `PANEL_SETUP_CODE`: un código de 8 caracteres o más. Sirve para crear las cuentas del panel.
 5. **Stripe (cuenta de la abogada).** En Stripe, en modo de pruebas:
    - Developers → API keys → copiar la clave secreta a la variable `STRIPE_SECRET_KEY`.

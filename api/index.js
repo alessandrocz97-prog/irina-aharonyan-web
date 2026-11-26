@@ -1,5 +1,5 @@
 // Única función del servidor: enruta todas las llamadas /api/*.
-import { HttpError, json, readJson, dbConfigured, q, getSettings, saveSetting, audit, madrid, addDays, isDay } from '../lib/core.js';
+import { HttpError, json, readJson, dbConfigured, q, getSettings, saveSetting, audit, madrid, addDays, isDay, sessionSecret } from '../lib/core.js';
 import * as auth from '../lib/auth.js';
 import * as bk from '../lib/bookings.js';
 import { stripeMode, webhookConfigured, verifyWebhook } from '../lib/payments.js';
@@ -22,6 +22,7 @@ async function setupStatus() {
     const r = await q('select count(*)::int as n from admins');
     out.db = true;
     out.hasAccounts = r.rows[0].n > 0;
+    out.sessionSecret = Boolean(await sessionSecret());   // si no viene de Vercel, se crea sola en la base de datos
     const s = await getSettings();
     out.pricesSet = Object.values(s.modes).some((m) => m.enabled && Number.isInteger(m.priceCents));
   } catch (e) {

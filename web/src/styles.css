@@ -126,12 +126,25 @@ html[lang="hy"] .btn, html[lang="ru"] .btn { letter-spacing: .08em; }
 .util__contact svg { width: 15px; height: 15px; color: var(--bronze); }
 .util__hours { white-space: nowrap; }
 .lang { --lp: 11px; --ls: .14em; display: flex; align-items: center; }
-.lang button { appearance: none; position: relative; border: 0; background: none; padding: 12px var(--lp); font: inherit; letter-spacing: var(--ls); color: var(--ink-3); cursor: pointer; }
+.lang button { appearance: none; position: relative; display: inline-flex; align-items: center; gap: 7px; border: 0; background: none; padding: 12px var(--lp); font: inherit; letter-spacing: var(--ls); color: var(--ink-3); cursor: pointer; }
+.flag { flex: none; width: 18px; height: 12px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(38, 35, 33, .18); opacity: .82; transition: opacity .15s ease; }
+.lang button:hover .flag, .lang button[aria-pressed="true"] .flag { opacity: 1; }
+/* En el escritorio el selector sale un poco de la columna hacia la derecha, sin acercarse al borde de la pantalla */
+.util .lang { margin-right: calc(-1 * var(--lp) - clamp(0px, (100vw - 1200px) / 2 - 32px, 72px)); }
 .lang button + button::before { content: ""; position: absolute; left: 0; top: 50%; width: 1px; height: 12px; background: var(--line-strong); transform: translateY(-50%); }
 .lang button[aria-pressed="true"] { color: var(--ink); }
 .lang button[aria-pressed="true"]::after { content: ""; position: absolute; left: var(--lp); right: calc(var(--lp) + var(--ls)); bottom: 8px; height: 1px; background: var(--bronze); }
 /* Cinco idiomas en pantallas estrechas: se aprieta el selector y, en las más pequeñas, el teléfono queda en su icono */
-@media (max-width: 420px) { .util .lang { --lp: 7px; --ls: .08em; } .util__in { gap: 10px; } }
+/* Con las banderas el selector ocupa más: por debajo de este ancho el horario cede el sitio (sigue en el pie y en Contacto) */
+@media (max-width: 979px) { .util__hours { display: none; } }
+/* En el móvil, solo las banderas: el nombre del idioma sigue en la etiqueta accesible de cada botón */
+@media (max-width: 560px) {
+  .util .lang { --lp: 8px; margin-right: -8px; }
+  .util .lang button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .util .lang button[aria-pressed="true"]::after { right: var(--lp); }
+  .util .lang .flag { width: 21px; height: 14px; }
+  .util__in { gap: 10px; }
+}
 @media (max-width: 350px) { .util__contact a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .util__contact a { padding: 10px 6px 10px 0; } }
 
 /* ---------- Cabecera de marca (portada) ---------- */
@@ -197,7 +210,7 @@ html[lang="hy"] .nav { gap: clamp(12px, 1.5vw, 22px); }
 .menu nav a { display: block; padding: 11px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; font: italic 500 calc(var(--k) * clamp(1.8rem, 7.5vw, 2.5rem))/1.15 var(--display); }
 .menu nav a[aria-current="page"] { color: var(--bronze-deep); }
 .menu__foot { display: grid; gap: 12px; margin-top: auto; padding-top: 22px; }
-.menu__foot .lang { justify-content: center; font-size: .9rem; letter-spacing: .08em; }
+.menu__foot .lang { --lp: 9px; justify-content: center; font-size: .9rem; letter-spacing: .08em; }
 
 /* ---------- Acciones fijas en móvil ---------- */
 .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: none; grid-template-columns: 1fr 1.5fr; gap: 10px; padding: 10px var(--gutter); background: rgba(248, 245, 239, .95); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
