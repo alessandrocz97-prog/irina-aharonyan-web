@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de reservas · Irina Aharonyan</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23262321'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Georgia,serif' font-size='34' fill='%23F8F5EF'%3EIA%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --ivory: #F8F5EF; --porcelain: #FDFCFA; --linen: #F0EAE0;
+  --ink: #262321; --ink-2: #514A43; --ink-3: #766C62;
+  --bronze: #8A6748; --bronze-deep: #6B4E36; --bronze-soft: #C2A98F;
+  --line: rgba(38,35,33,.13); --line-strong: rgba(38,35,33,.3);
+  --ok: #2F6B4F; --ok-bg: #E7F0EA; --warn: #8A5A12; --warn-bg: #F6ECD7; --danger: #8C2F1F; --danger-bg: #F6E4DF; --muted-bg: #ECE7DF;
+  --display: "Cormorant Garamond", Georgia, serif;
+  --ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Herramienta de trabajo: columna de calendario a la izquierda y detalle del día a la derecha. */
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--ivory); color: var(--ink); font: 15px/1.5 var(--ui); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--display); font-weight: 500; margin: 0; line-height: 1.15; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--bronze-deep); outline-offset: 2px; border-radius: 3px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 36px); }
+/* La propiedad abreviada `font` restablece las cifras; se fuerzan alineadas en todo el panel. */
+*, *::before, *::after { font-variant-numeric: lining-nums !important; }
+.num, .num * { font-variant-numeric: lining-nums tabular-nums !important; }
+
+/* Cabecera */
+.top { background: var(--ink); color: var(--ivory); }
+.top__in { display: flex; align-items: center; gap: 18px; min-height: 58px; }
+.top__brand { display: flex; align-items: baseline; gap: 12px; font: 500 1.35rem/1 var(--display); letter-spacing: .04em; }
+.top__brand b { font-weight: 500; color: var(--bronze-soft); padding-right: 12px; border-right: 1px solid rgba(248,245,239,.3); }
+.top__user { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 14px; color: rgba(248,245,239,.8); }
+.tabs { background: var(--porcelain); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+.tabs__in { display: flex; gap: 4px; overflow-x: auto; }
+.tab { appearance: none; border: 0; background: none; padding: 14px 16px 12px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--ink-2); white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--bronze); font-weight: 600; }
+main { padding: clamp(18px, 3vw, 32px) 0 64px; }
+
+/* Botones y campos */
+.btn { appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--porcelain); cursor: pointer; text-decoration: none; color: var(--ink); white-space: nowrap; transition: background-color .15s ease, transform .12s ease; }
+.btn:hover { background: var(--linen); }
+.btn:active { transform: scale(.97); }
+.btn--solid { background: var(--ink); border-color: var(--ink); color: var(--ivory); }
+.btn--solid:hover { background: var(--bronze-deep); border-color: var(--bronze-deep); }
+.btn--danger { border-color: var(--danger); color: var(--danger); }
+.btn--danger:hover { background: var(--danger-bg); }
+.btn--ghost { border-color: transparent; background: none; color: inherit; }
+.btn--sm { min-height: 32px; padding: 0 10px; font-size: 13.5px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.top .btn { border-color: rgba(248,245,239,.35); background: none; color: var(--ivory); }
+.top .btn:hover { background: rgba(248,245,239,.12); }
+.field { display: grid; gap: 5px; margin-bottom: 14px; min-width: 0; }
+.field > span, .field > label { font-size: 12.5px; font-weight: 600; letter-spacing: .03em; color: var(--ink-2); }
+.field small { color: var(--ink-3); }
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], input[type="time"], input[type="date"], select, textarea {
+  width: 100%; min-height: 40px; padding: 8px 11px; border: 1px solid var(--line-strong); border-radius: 8px; background: #fff; }
+textarea { min-height: 84px; resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.check { display: flex; gap: 9px; align-items: flex-start; margin: 6px 0 14px; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ink); flex: none; }
+.err { color: var(--danger); font-size: 14px; min-height: 1.4em; margin: 4px 0 10px; }
+.err:empty { min-height: 0; margin: 0; }
+.hint { color: var(--ink-3); font-size: 13.5px; }
+
+/* Tarjetas, etiquetas */
+.card { background: var(--porcelain); border: 1px solid var(--line); border-radius: 12px; padding: clamp(16px, 2.2vw, 24px); }
+.card + .card { margin-top: 18px; }
+.card h2 { font-size: 1.55rem; margin-bottom: 14px; }
+.card h3 { font: 600 12.5px/1.3 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 20px 0 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; background: var(--muted-bg); color: var(--ink-2); }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip--confirmed, .chip--ok { background: var(--ok-bg); color: var(--ok); }
+.chip--hold, .chip--warn { background: var(--warn-bg); color: var(--warn); }
+.chip--cancelled, .chip--refunded, .chip--bad { background: var(--danger-bg); color: var(--danger); }
+.chip--free { background: #fff; border: 1px solid var(--line-strong); color: var(--ink-2); }
+.chip--closed { background: var(--muted-bg); color: var(--ink-3); }
+
+/* Agenda */
+.agenda { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.agenda > .card + .card { margin-top: 0; }
+.side { display: grid; gap: 20px; align-content: start; min-width: 0; }
+.side > .card + .card { margin-top: 0; }
+.todaybar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; margin-bottom: 16px; }
+.todaybar p { margin: 0; color: var(--ink-2); }
+.todaybar p::first-letter { text-transform: uppercase; }
+.todaybar b { color: var(--ink); font-weight: 600; }
+.next { list-style: none; margin: 0; padding: 0; }
+.next li + li { border-top: 1px solid var(--line); }
+.next button { appearance: none; width: 100%; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 10px 6px; margin: 0 -6px; width: calc(100% + 12px); border: 0; border-radius: 8px; background: none; text-align: left; cursor: pointer; }
+.next button:hover { background: #fff; }
+.next b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.next b::first-letter { text-transform: uppercase; }
+.next small { display: block; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link { appearance: none; border: 0; background: none; padding: 0; cursor: pointer; color: var(--bronze-deep); text-decoration: underline; text-decoration-color: var(--bronze-soft); text-underline-offset: 3px; }
+.link:hover { color: var(--ink); }
+.cal__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal__title { font: 500 1.5rem/1 var(--display); }
+.cal__title::first-letter { text-transform: uppercase; }
+.cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal__dow { text-align: center; font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 4px 0; }
+.cday { appearance: none; position: relative; aspect-ratio: 1 / .92; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; padding: 2px; }
+.cday:hover { border-color: var(--bronze); }
+.cday b { font-weight: 500; font-size: 15px; }
+.cday small { display: flex; gap: 3px; height: 7px; }
+.cday i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+.cday i.h { background: var(--warn); }
+.cday { min-width: 0; overflow: hidden; }
+.cday em { font-style: normal; font-size: 10.5px; color: var(--ink-3); line-height: 1; white-space: nowrap; }
+.cday--off { background: repeating-linear-gradient(135deg, var(--muted-bg) 0 6px, #e2dcd2 6px 7px); color: var(--ink-3); }
+.cday--none { background: transparent; border-style: dashed; color: var(--ink-3); }
+.cday--past { opacity: .55; }
+.cday--today { border-color: var(--bronze); box-shadow: inset 0 0 0 1px var(--bronze); }
+.cday[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--ivory); }
+.cday[aria-pressed="true"] i { background: var(--ivory); }
+.cday[aria-pressed="true"] em { color: rgba(248,245,239,.75); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 14px; font-size: 12.5px; color: var(--ink-3); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); display: inline-block; }
+.legend i.h { background: var(--warn); } .legend i.o { border-radius: 2px; background: repeating-linear-gradient(135deg, var(--muted-bg) 0 3px, #d9d2c7 3px 4px); }
+.legend i.t { background: none; border: 1.5px solid var(--bronze); }
+.dayhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin-bottom: 6px; }
+.dayhead h2 { margin: 0; }
+.dayhead h2::first-letter { text-transform: uppercase; }
+.dayhead__act { display: flex; flex-wrap: wrap; gap: 8px; }
+.daynav { display: flex; gap: 6px; }
+.daysum { margin: 5px 0 0; color: var(--ink-3); font-size: 14px; }
+.dayact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 2px; }
+.slots { list-style: none; margin: 14px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.slotsep { padding: 14px 0 5px; font-size: 13px; font-weight: 600; color: var(--ink-3); border-bottom: 1px solid var(--line); }
+.slotsep:first-child { padding-top: 10px; }
+.slot { display: grid; grid-template-columns: 64px 128px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 54px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.slot--booked, .slot--hold { margin: 0 -12px; padding-inline: 12px; background: #fff; box-shadow: inset 3px 0 0 var(--bronze); }
+.slot--hold { box-shadow: inset 3px 0 0 var(--warn); }
+.slot--past { opacity: .6; }
+.slot__t { font: 500 1.3rem/1 var(--display); }
+.slot .chip { justify-self: start; }
+.slot__who { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot__who small { color: var(--ink-3); }
+.slot__act { display: flex; gap: 6px; }
+.slot--closed .slot__t { color: var(--ink-3); text-decoration: line-through; }
+.empty { padding: 26px 0; color: var(--ink-3); }
+.addslot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.addslot input { width: 130px; }
+
+/* Tablas */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px; }
+.toolbar input[type="search"] { flex: 1 1 220px; max-width: 340px; min-height: 38px; padding: 6px 11px; border: 1px solid var(--line-strong); border-radius: 8px; background: #fff; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: #fff; }
+.seg button { appearance: none; border: 0; background: none; padding: 8px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--ivory); }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 8px 10px; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr[data-open] { cursor: pointer; }
+tbody tr[data-open]:hover { background: #fff; }
+td small { display: block; color: var(--ink-3); }
+
+/* Ajustes */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.grid2 > .card + .card { margin-top: 0; }
+.modes { display: grid; gap: 10px; }
+.mode { display: grid; grid-template-columns: minmax(0, 1fr) 150px; align-items: center; gap: 12px; }
+.mode .check { margin: 0; }
+.euro { position: relative; }
+.euro input { padding-right: 30px; text-align: right; }
+.fee { margin: -4px 0 2px; color: var(--ink-3); font-size: 13px; text-align: right; min-height: 1.2em; }
+.feecalc { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px; }
+.feecalc .field { margin-bottom: 0; }
+.feeout { margin: 12px 0 0; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.feeout b { font-weight: 600; }
+.euro::after { content: "€"; position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: var(--ink-3); }
+/* Horario: días con tramos «de … a …», reglas y días libres */
+.hgrid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.cardhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-bottom: 14px; }
+.cardhead h2 { margin: 0; }
+.wk__day { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 16px; align-items: start; padding: 14px 0; border-top: 1px solid var(--line); }
+.wk__day:last-child { padding-bottom: 0; }
+.sw { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer; font-weight: 600; }
+.sw input { appearance: none; position: relative; flex: none; width: 38px; height: 22px; margin: 0; border-radius: 999px; background: var(--line-strong); cursor: pointer; transition: background-color .15s ease; }
+.sw input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s cubic-bezier(.23, 1, .32, 1); }
+.sw input:checked { background: var(--ok); }
+.sw input:checked::after { transform: translateX(16px); }
+.rng { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.rng input { width: 134px; }
+.rng span { color: var(--ink-3); }
+.rng__x { width: 32px; padding: 0; font-size: 18px; line-height: 1; color: var(--ink-3); }
+.rng__x:hover { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+.wk__sum { margin: 8px 0 0; color: var(--ink-3); font-size: 13.5px; }
+.wk__sum b { color: var(--ink-2); font-weight: 600; }
+.wk__err { color: var(--danger); }
+.wk__off { margin: 0; padding-top: 9px; color: var(--ink-3); }
+.closeform { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; margin-top: 14px; }
+.closeform .wide { grid-column: 1 / -1; }
+.closures { list-style: none; margin: 18px 0 0; padding: 0; }
+.closures li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+.closures b { display: block; font-weight: 600; }
+.closures b::first-letter { text-transform: uppercase; }
+.closures small { display: block; color: var(--ink-3); }
+.closures .keep { color: var(--warn); }
+.quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: -6px 0 16px; }
+.quick .btn { text-decoration: none; }
+.dlg h3 { font: 600 12.5px/1.3 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px; }
+.statusrow { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.savebar { position: sticky; bottom: 0; display: flex; align-items: center; justify-content: flex-end; gap: 14px; margin-top: 18px; padding: 12px 0; background: linear-gradient(rgba(248,245,239,0), var(--ivory) 30%); }
+
+/* Acceso y puesta en marcha */
+.center { max-width: 460px; margin: clamp(24px, 7vh, 80px) auto 0; }
+.center--wide { max-width: 640px; }
+.center h1 { font: italic 500 2.3rem/1.1 var(--display); margin-bottom: 6px; }
+.center > p { color: var(--ink-2); margin: 0 0 20px; }
+.steps { list-style: none; margin: 0 0 6px; padding: 0; }
+.steps li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.steps li:last-child { border-bottom: 0; }
+.steps .dot { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; font-size: 13px; margin-top: 1px; }
+.steps .done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+.steps b { display: block; font-weight: 600; }
+.steps p { margin: 2px 0 0; color: var(--ink-2); font-size: 14px; }
+code { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--muted-bg); padding: 1px 6px; border-radius: 4px; }
+
+/* Diálogos y avisos */
+dialog { width: min(560px, calc(100vw - 28px)); max-height: calc(100vh - 28px); border: 0; border-radius: 14px; padding: 0; background: var(--porcelain); color: var(--ink); box-shadow: 0 40px 90px -30px rgba(38,35,33,.6); }
+dialog::backdrop { background: rgba(38,35,33,.45); }
+.dlg { padding: clamp(18px, 3vw, 28px); }
+.dlg h2 { font-size: 1.8rem; margin-bottom: 4px; }
+.dlg__sub { color: var(--ink-3); margin: 0 0 16px; }
+.dl { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px 14px; margin: 0 0 18px; }
+.dl dt { color: var(--ink-3); } .dl dd { margin: 0; overflow-wrap: anywhere; }
+.dl a, .tbl a { color: var(--bronze-deep); text-decoration-color: var(--bronze-soft); text-underline-offset: 3px; }
+.dl a:hover, .tbl a:hover { color: var(--ink); }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.listhead { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+.listhead h2 { margin: 0 6px 0 0; }
+.listhead select { width: auto; padding-right: 30px; }
+.listhead .btn { text-decoration: none; }
+.spacer { flex: 1; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.tile { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; display: grid; gap: 3px; min-width: 0; }
+.tile__k { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.tile b { font: 500 1.5rem/1.2 var(--display); }
+.tile small { color: var(--ink-3); font-size: 12.5px; }
+.invsum { margin: 14px 0 18px; color: var(--ink-2); }
+td.r, th.r { text-align: right; white-space: nowrap; }
+tbody tr[data-inv] { cursor: pointer; }
+tbody tr[data-inv]:hover { background: #fff; }
+.line { display: grid; grid-template-columns: minmax(0, 1fr) 78px 118px 34px; gap: 8px; margin-bottom: 8px; align-items: center; }
+.line .btn { padding: 0; height: 38px; }
+.linehead { display: grid; grid-template-columns: minmax(0, 1fr) 78px 118px 34px; gap: 8px; font-size: 12.5px; font-weight: 600; letter-spacing: .03em; color: var(--ink-2); margin-bottom: 5px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 14px; align-items: start; }
+.invtotal { margin: 4px 0 14px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.invtotal b { font-weight: 600; }
+dialog:has(.dlg--wide) { width: min(680px, calc(100vw - 28px)); }
+.paidrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.paidrow input { width: auto; }
+.invact { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.invact .btn { text-decoration: none; }
+.pending { color: var(--warn); font-weight: 600; }
+.dl .err:empty { display: none; }
+.dlg__act { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.dlg hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 50; padding: 10px 16px; border-radius: 10px; background: var(--ink); color: var(--ivory); transition: opacity .2s ease, transform .2s ease; max-width: calc(100vw - 32px); }
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+.aeat { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 16px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink-2); }
+.aeat p { margin: 0; flex: 1 1 280px; }
+.aeat--warn { border-color: var(--bronze-soft); background: var(--warn-bg); color: var(--warn); }
+.aeat--bad { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
+.muted { color: var(--ink-3); }
+.vferr { margin: 6px 0 0; color: var(--danger); font-size: 13.5px; }
+.decl { font-size: 14.5px; line-height: 1.5; }
+.decl h3 { margin: 18px 0 8px; }
+.decl dl { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 9px 10px; margin: 0; }
+.decl dt { color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.decl dd { margin: 0; overflow-wrap: anywhere; }
+.decl dd b { display: block; font-weight: 600; }
+.decl .draft { padding: 9px 12px; border: 1px solid var(--bronze-soft); border-radius: 8px; background: var(--warn-bg); color: var(--warn); }
+@media print {
+  body > *:not(dialog) { display: none !important; }
+  dialog { position: static; border: 0; box-shadow: none; max-width: none; width: auto; padding: 0; }
+  dialog::backdrop { display: none; }
+  .dlg { max-width: none; box-shadow: none; }
+  .dlg__act, .decl .draft { display: none !important; }
+}
+.banner { margin-bottom: 16px; padding: 11px 14px; border: 1px solid var(--bronze-soft); border-radius: 10px; background: var(--warn-bg); color: var(--warn); }
+
+@media (max-width: 900px) {
+  .agenda, .grid2 { grid-template-columns: minmax(0, 1fr); }
+  .top__brand { font-size: 1.15rem; white-space: nowrap; }
+  .cday em { font-size: 9.5px; }
+  .agenda { gap: 16px; }
+  .side { display: contents; }
+  #cal { order: 1; } #dayp { order: 2; } #nextc { order: 3; }
+  .hgrid { grid-template-columns: minmax(0, 1fr); }
+  .slot { grid-template-columns: 54px minmax(0, 1fr) auto; gap: 4px 10px; }
+  .slot .chip { grid-column: 2; grid-row: 1; justify-self: start; }
+  .slot__who { grid-column: 2 / -1; grid-row: 2; }
+  .slot__who:empty { display: none; }
+  .slot__act { grid-column: 3; grid-row: 1; }
+  .slot--booked, .slot--hold { margin-inline: -8px; padding-inline: 8px; }
+  .row { grid-template-columns: 1fr; }
+  .top__user span { display: none; }
+}
+@media (max-width: 700px) {
+  /* Listado de reservas en el móvil: cada reserva, una ficha */
+  .blist thead { display: none; }
+  .blist, .blist tbody { display: block; }
+  .blist tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .blist td { display: block; min-width: 0; padding: 0; border: 0; }
+  .blist td:nth-child(1) { grid-area: 1 / 1; }
+  .blist td:nth-child(1) b::first-letter { text-transform: uppercase; }
+  .blist td:nth-child(1) small { display: inline; margin-left: 8px; }
+  .blist td:nth-child(4) { grid-area: 1 / 2; justify-self: end; text-align: right; }
+  .blist td:nth-child(2) { grid-area: 2 / 1 / 3 / -1; }
+  .blist td:nth-child(3) { grid-area: 3 / 1; color: var(--ink-2); }
+  .blist td:nth-child(3) small { display: inline; margin-left: 8px; }
+  .blist td:nth-child(5) { grid-area: 3 / 2; text-align: right; }
+  .blist td:nth-child(5) small { display: none; }
+  .toolbar input[type="search"] { max-width: none; flex-basis: 100%; }
+  .tiles { grid-template-columns: 1fr 1fr; }
+  .line, .linehead { grid-template-columns: minmax(0, 1fr) 62px 96px 34px; }
+  .row3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 460px) {
+  .feecalc { grid-template-columns: 1fr 1fr; }
+  .feecalc .field:first-child { grid-column: 1 / -1; }
+  .tabs__in { gap: 0; justify-content: space-between; }
+  .tab { padding: 14px 5px 12px; font-size: .9rem; }
+  .tab[data-tab="actividad"] { display: none; }   /* en el móvil se llega desde Ajustes */
+  .wk__day { grid-template-columns: minmax(0, 1fr); }
+  .rng { display: grid; grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) 32px; }
+  .rng input { width: 100%; padding-inline: 8px; }
+  .closeform { grid-template-columns: 1fr; }
+}
+@media (max-width: 400px) {
+  .top__in { gap: 10px; }
+  .top__brand { font-size: 1.02rem; gap: 8px; }
+  .top__brand b { padding-right: 8px; }
+  .top__user { gap: 8px; }
+  .top .btn { padding: 0 9px; }
+}
+@media (max-width: 340px) {
+  .top__brand b { display: none; }
+  .tab { padding-inline: 3px; font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var app = $('#app'), dlg = $('#dlg');
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  var MODE = { presencial: 'Presencial', video: 'Videollamada', telefono: 'Teléfono' };
+  var STATUS = { confirmed: 'Confirmada', hold: 'Pago en curso', cancelled: 'Cancelada', refunded: 'Devuelta', expired: 'Caducada' };
+  var WEEK = ['', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  var ERR = {
+    bad_credentials: 'Correo o contraseña incorrectos.',
+    too_many_attempts: 'Demasiados intentos fallidos. Espere 15 minutos.',
+    slot_taken: 'Esa hora ya está ocupada.',
+    not_active: 'La reserva ya no está activa.',
+    refund_failed: 'Stripe no ha podido hacer la devolución. La reserva sigue activa: inténtelo de nuevo o devuelva el importe desde Stripe.',
+    weak_password: 'La contraseña debe tener al menos 10 caracteres.',
+    bad_setup_code: 'El código de alta no coincide con el del servidor.',
+    setup_closed: 'El alta de cuentas está cerrada.',
+    bad_account: 'Revise el nombre y el correo.',
+    too_many_accounts: 'Ya existe el máximo de cuentas.',
+    bad_price: 'Precio no válido. El mínimo es 0,50 €.',
+    bad_schedule: 'Revise las horas del horario.',
+    bad_range: 'Revise las fechas: la segunda no puede ser anterior a la primera ni estar ya pasada.',
+    range_too_long: 'Como máximo se bloquean 120 días de una vez.',
+    same_slot: 'La reserva ya está en ese día y a esa hora.',
+    slot_past: 'Esa hora ya ha pasado.',
+    bad_time: 'Indique la hora.',
+    bad_notice: 'Antelación no válida.', bad_horizon: 'Días de agenda no válidos.', bad_duration: 'Duración no válida.',
+    bad_name: 'Indique el nombre del cliente.',
+    payments_off: 'Stripe no está conectado.',
+    issuer_incomplete: 'Para activar la facturación faltan el nombre, el NIF o el domicilio fiscal.',
+    bad_vat: 'IVA no válido.', bad_series: 'La serie son de una a cuatro letras. La R está reservada a las rectificativas.',
+    bad_copy_email: 'Revise el correo de la copia.',
+    invoice_invoicing_off: 'La facturación automática está apagada. Actívela en Ajustes.',
+    invoice_issuer_incomplete: 'Faltan sus datos fiscales en Ajustes.',
+    invoice_recipient_data_required: 'Supera los 400 €: hace falta el NIF y el domicilio del cliente, y la factura se emite aparte.',
+    invoice_not_billable: 'Solo se facturan aquí las reservas cobradas en la web y confirmadas.',
+    bad_lines: 'Revise los conceptos: descripción, cantidad y precio.',
+    bad_recipient: 'Indique el nombre del cliente.', bad_tax_id: 'Revise el NIF.', bad_email: 'Revise el correo.', bad_irpf: 'Retención no válida.',
+    recipient_data_required: 'Hacen falta el NIF y el domicilio del cliente: la factura supera los 400 € o lleva retención.',
+    bad_date: 'La fecha no puede ser posterior a hoy ni anterior a la última factura emitida.',
+    bad_paid_date: 'La fecha de cobro no puede ser futura.',
+    not_editable: 'Las facturas de la web ya nacen cobradas.', not_rectifiable: 'Una rectificativa no se rectifica.',
+    rectify_via_booking: 'Las facturas de la web se rectifican al cancelar la reserva con devolución.',
+    already_rectified: 'Esta factura ya está rectificada.', no_client_email: 'La factura no tiene correo del cliente.',
+    mail_off: 'La factura está expedida, pero el correo no está configurado en Vercel.',
+    mail_failed: 'La factura está expedida, pero el envío ha fallado. Inténtelo de nuevo.',
+    vf_not_registered: 'Aún no está registrada en la AEAT. Se enviará sola al cliente en cuanto lo esté.',
+    vf_not_configured: 'Falta la clave del proveedor en Vercel (VERIFACTI_API_KEY).',
+    vf_needs_invoicing: 'Antes hay que activar la facturación y completar los datos fiscales.',
+    vf_declaration_incomplete: 'Con la clave real hace falta la declaración responsable completa: productor, NIF, domicilio, lugar y fecha.',
+    vf_locked: 'Ya se han enviado facturas reales: VERI*FACTU no se puede apagar.',
+    vf_date_today: 'Con VERI*FACTU la factura lleva la fecha de hoy. Lo ya ocurrido se indica en la fecha de la operación.',
+    vf_vat_zero: 'Las facturas sin IVA necesitan declarar la causa y todavía no se pueden emitir desde aquí.',
+    bad_tax_id_es: 'El NIF o NIE no es correcto. Si el cliente no tiene, elija otro tipo de documento.',
+    bad_id_doc: 'Revise el tipo de documento y el país (dos letras).',
+    bad_operation_date: 'La fecha de la operación no puede ser posterior a la de la factura.',
+    bad_signed_date: 'La fecha de la declaración no puede ser futura.',
+    not_fixable: 'Esta factura ya no se puede corregir: está registrada o entregada.',
+    not_logged_in: 'La sesión ha caducado. Vuelva a entrar.',
+    db_missing: 'La base de datos no está conectada.',
+    session_secret_missing: 'Falta la clave de sesión en el servidor.'
+  };
+  function errText(e) { return ERR[e && e.code] || 'No se ha podido completar la acción. Inténtelo de nuevo.'; }
+
+  var ACTION = {
+    login: 'Entró en el panel', account_created: 'Creó una cuenta', account_reset: 'Restableció una cuenta', password_changed: 'Cambió su contraseña',
+    paid_confirmed: 'Pago recibido: reserva confirmada', paid_confirmed_late: 'Pago tardío: reserva recuperada',
+    paid_conflict_refunded: 'Pago tardío con la hora ocupada: importe devuelto', refunded: 'Devolución hecha desde Stripe',
+    manual_booking: 'Añadió una reserva a mano', cancelled: 'Canceló una reserva', cancelled_refunded: 'Canceló una reserva y devolvió el importe',
+    slot_closed: 'Bloqueó', slot_opened: 'Abrió', override_removed: 'Quitó una excepción de', settings_changed: 'Cambió los ajustes',
+    range_closed: 'Bloqueó', range_opened: 'Desbloqueó', booking_moved: 'Cambió una reserva a',
+    invoice_issued: 'Factura expedida', invoice_rectified: 'Factura rectificativa expedida', invoice_sent: 'Envió la factura', invoice_send_failed: 'No pudo enviar la factura',
+    invoice_paid: 'Marcó como cobrada la factura', invoice_unpaid: 'Marcó como pendiente la factura',
+    vf_retry: 'Reintentó el envío a la AEAT', invoice_fixed: 'Corrigió los datos de la factura'
+  };
+
+  function api(method, path, body) {
+    return fetch('/api' + path, {
+      method: method, credentials: 'same-origin',
+      headers: { 'content-type': 'application/json', 'x-panel': '1' },
+      body: body ? JSON.stringify(body) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) { var e = new Error(d.error || 'error'); e.code = d.error; e.status = r.status; throw e; }
+        return d;
+      });
+    }).catch(function (e) {
+      if (e.status === 401 && S.me) { S.me = null; viewLogin('La sesión ha caducado. Vuelva a entrar.'); }
+      throw e;
+    });
+  }
+
+  var dfmt = function (o) { return new Intl.DateTimeFormat('es-ES', Object.assign({ timeZone: 'UTC' }, o)); };
+  function day(iso, o) { return dfmt(o || { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(iso + 'T12:00:00Z')); }
+  function stamp(ts) { return new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(ts)); }
+  function money(c) { return c == null ? '—' : new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(c / 100); }
+  function payText(b) { return b.payment === 'stripe' ? (b.status === 'hold' ? 'Pendiente de pago en la web' : 'Cobrada en la web') : b.payment === 'manual' ? 'Cobrada fuera de la web' : 'Sin cobro registrado'; }
+  function chip(kind, text) { return '<span class="chip chip--' + kind + '">' + esc(text) + '</span>'; }
+  function plusDays(iso, n) { var d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+  function nowHM() { return new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()); }
+  function addMonths(m, n) { var p = m.split('-').map(Number); var d = new Date(Date.UTC(p[0], p[1] - 1 + n, 1)); return d.toISOString().slice(0, 7); }
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('is-on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('is-on'); }, 3200); }
+
+  var S = { status: null, me: null, today: null, tab: 'agenda', month: null, day: null, months: {}, dayData: null, list: [], filter: 'proximas', settings: null, stripe: null, webhook: false, mail: false, audit: [], fee: null, invYear: null, invData: null,
+    upcoming: null, q: '', sched: null, closures: [], booking: null };
+
+  /* ---------------------------- Puesta en marcha ---------------------------- */
+  function viewGate(note) {
+    var s = S.status || {};
+    function li(ok, title, text) { return '<li class="' + (ok ? 'done' : '') + '"><span class="dot">' + (ok ? '✓' : '') + '</span><div><b>' + title + '</b><p>' + text + '</p></div></li>'; }
+    var canCreate = s.db && s.sessionSecret && s.setupOpen;
+    app.innerHTML = '<div class="wrap"><div class="center center--wide"><h1>Puesta en marcha</h1><p>El panel se activa cuando estos tres pasos están hechos. Los valores se escriben en Vercel, nunca aquí.</p>' +
+      '<div class="card"><ol class="steps">' +
+      li(s.db, 'Base de datos conectada', s.db ? 'Conexión correcta.' : 'En Vercel, abra el proyecto → Storage → Create Database → Neon (Postgres) → región Frankfurt → Connect. Después, Redeploy.') +
+      li(s.sessionSecret, 'Clave de sesión', s.sessionSecret ? 'Configurada.' : 'Falta la variable <code>SESSION_SECRET</code> en el proyecto.') +
+      li(s.hasAccounts, 'Cuentas del panel', s.hasAccounts ? 'Hay al menos una cuenta.' :
+        (s.setupOpen ? 'Cree abajo la primera cuenta con el código de alta.' : 'Añada en Vercel la variable <code>PANEL_SETUP_CODE</code> con un código que solo usted conozca (mínimo 8 caracteres) y haga Redeploy.')) +
+      '</ol></div>' +
+      (canCreate ? '<form class="card" id="f-setup"><h2>Crear una cuenta</h2>' +
+        '<label class="field"><span>Código de alta</span><input name="code" type="password" autocomplete="off" required></label>' +
+        '<div class="row"><label class="field"><span>Nombre</span><input name="name" type="text" required></label>' +
+        '<label class="field"><span>Tipo de cuenta</span><select name="role"><option value="titular">Titular (la abogada)</option><option value="gestor">Gestor</option></select></label></div>' +
+        '<label class="field"><span>Correo</span><input name="email" type="email" autocomplete="username" required></label>' +
+        '<label class="field"><span>Contraseña</span><input name="password" type="password" autocomplete="new-password" minlength="10" required><small>Mínimo 10 caracteres. Cada persona, la suya.</small></label>' +
+        '<p class="err" role="alert">' + esc(note || '') + '</p>' +
+        '<div class="dlg__act">' + (s.hasAccounts ? '<button type="button" class="btn" data-go="login">Ir al acceso</button>' : '') + '<button class="btn btn--solid" type="submit">Crear cuenta</button></div></form>' : '') +
+      '</div></div>';
+  }
+
+  /* --------------------------------- Acceso --------------------------------- */
+  function viewLogin(note) {
+    app.innerHTML = '<div class="wrap"><div class="center"><h1>Panel de reservas</h1><p>Irina Aharonyan · Abogada penalista</p>' +
+      '<form class="card" id="f-login">' +
+      '<label class="field"><span>Correo</span><input name="email" type="email" autocomplete="username" required autofocus></label>' +
+      '<label class="field"><span>Contraseña</span><input name="password" type="password" autocomplete="current-password" required></label>' +
+      '<p class="err" role="alert">' + esc(note || '') + '</p>' +
+      '<button class="btn btn--solid" type="submit" style="width:100%">Entrar</button>' +
+      (S.status && S.status.setupOpen ? '<p class="hint" style="margin:14px 0 0;text-align:center"><a href="#" data-go="gate">Crear otra cuenta con el código de alta</a></p>' : '') +
+      '</form></div></div>';
+  }
+
+  /* -------------------------------- Estructura -------------------------------- */
+  function shell(inner) {
+    var tabs = [['agenda', 'Agenda'], ['reservas', 'Reservas'], ['horario', 'Horario'], ['facturas', 'Facturas'], ['ajustes', 'Ajustes'], ['actividad', 'Actividad']];
+    return '<header class="top"><div class="wrap top__in"><div class="top__brand"><b>IA</b>Panel de reservas</div>' +
+      '<div class="top__user"><span>' + esc(S.me.name) + '</span><a class="btn btn--sm" href="/" target="_blank" rel="noopener">Ver la web</a><button class="btn btn--sm" data-logout>Salir</button></div></div></header>' +
+      '<nav class="tabs" aria-label="Secciones"><div class="wrap tabs__in" role="tablist">' + tabs.map(function (t) {
+        return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + '</button>';
+      }).join('') + '</div></nav><main><div class="wrap">' + inner + '</div></main>';
+  }
+  function banner() {
+    if (S.stripe === null) return '<div class="banner"><b>La web no admite reservas todavía.</b> Falta conectar Stripe (Ajustes → Cobro). Mientras tanto puede usar la agenda y añadir reservas a mano.</div>';
+    if (S.stripe === 'test') return '<div class="banner"><b>Modo de pruebas.</b> Los pagos de la web no cobran dinero real. Cambie a las claves reales de Stripe cuando termine de probar.</div>';
+    return '';
+  }
+
+  /* --------------------------------- Agenda --------------------------------- */
+  function calHTML() {
+    var p = S.month.split('-').map(Number), first = new Date(Date.UTC(p[0], p[1] - 1, 1));
+    var off = (first.getUTCDay() + 6) % 7, dim = new Date(Date.UTC(p[0], p[1], 0)).getUTCDate(), data = S.months[S.month] || {};
+    var h = '<div class="cal__head"><button class="btn btn--sm" data-month="-1" aria-label="Mes anterior">‹</button>' +
+      '<div class="cal__title">' + dfmt({ month: 'long', year: 'numeric' }).format(first) + '</div>' +
+      '<button class="btn btn--sm" data-month="1" aria-label="Mes siguiente">›</button></div><div class="cal__grid">';
+    ['L', 'M', 'X', 'J', 'V', 'S', 'D'].forEach(function (d) { h += '<div class="cal__dow">' + d + '</div>'; });
+    for (var i = 0; i < off; i++) h += '<span></span>';
+    for (var d = 1; d <= dim; d++) {
+      var iso = S.month + '-' + (d < 10 ? '0' : '') + d, c = data[iso] || { free: 0, booked: 0, hold: 0, blocked: 0, closed: false };
+      var total = c.free + c.booked + c.hold + c.blocked, cls = 'cday';
+      if (c.closed) cls += ' cday--off'; else if (!total) cls += ' cday--none';
+      if (iso < S.today) cls += ' cday--past';
+      if (iso === S.today) cls += ' cday--today';
+      var dots = '';
+      for (var k = 0; k < Math.min(c.booked, 5); k++) dots += '<i></i>';
+      for (k = 0; k < Math.min(c.hold, 2); k++) dots += '<i class="h"></i>';
+      var label = day(iso) + ': ' + (c.closed ? 'día bloqueado' + (c.booked ? ', ' + plural(c.booked, 'reserva', 'reservas') : '')
+        : !total ? 'sin horario' : plural(c.booked, 'reserva', 'reservas') + ', ' + plural(c.free, 'hora libre', 'horas libres'));
+      h += '<button class="' + cls + '" data-day="' + iso + '" aria-pressed="' + (S.day === iso) + '" aria-label="' + label + '" title="' + label + '"><b class="num">' + d + '</b>' +
+        (dots ? '<small>' + dots + '</small>' : '<em>' + (!c.closed && total && iso >= S.today ? c.free + (c.free === 1 ? ' libre' : ' libres') : '') + '</em>') + '</button>';
+    }
+    return h + '</div><div class="legend"><span><i></i>Reserva confirmada</span><span><i class="h"></i>Pago en curso</span><span><i class="o"></i>Día bloqueado</span><span><i class="t"></i>Hoy</span></div>';
+  }
+
+  function todayBar() {
+    var c = (S.months[S.today.slice(0, 7)] || {})[S.today], txt = '<b>Hoy</b>, ' + day(S.today);
+    if (c) txt += ' · ' + (c.closed ? 'día bloqueado' : (c.booked ? plural(c.booked, 'reserva', 'reservas') : 'sin reservas') + ' · ' + plural(c.free, 'hora libre', 'horas libres'));
+    return '<p>' + txt + '</p><button class="btn btn--solid" data-manual="">Nueva reserva</button>';
+  }
+
+  function nextHTML() {
+    var h = '<h2>Próximas reservas</h2>';
+    if (!S.upcoming) return h + '<p class="empty" style="padding:4px 0 0">Cargando…</p>';
+    if (!S.upcoming.length) return h + '<p class="empty" style="padding:4px 0 0">No hay reservas confirmadas a partir de hoy.</p>';
+    return h + '<ul class="next">' + S.upcoming.slice(0, 5).map(function (b) {
+      var when = b.day === S.today ? 'Hoy' : b.day === plusDays(S.today, 1) ? 'Mañana' : day(b.day, { weekday: 'short', day: 'numeric', month: 'short' });
+      return '<li><button type="button" data-open="' + b.id + '"><span class="num"><b>' + when + '</b><small>' + b.time + ' h</small></span>' +
+        '<span><b>' + esc(b.name) + '</b><small>' + MODE[b.mode] + (b.phone ? ' · ' + esc(b.phone) : '') + '</small></span></button></li>';
+    }).join('') + '</ul>' + (S.upcoming.length > 5 ? '<p class="hint" style="margin:10px 0 0"><button type="button" class="link" data-tab="reservas">Ver las ' + S.upcoming.length + ' reservas</button></p>' : '');
+  }
+
+  function dayHTML() {
+    var D = S.dayData;
+    var nav = '<div class="daynav"><button class="btn btn--sm" data-daystep="-1" aria-label="Día anterior">‹</button>' +
+      (S.day !== S.today ? '<button class="btn btn--sm" data-today>Hoy</button>' : '') +
+      '<button class="btn btn--sm" data-daystep="1" aria-label="Día siguiente">›</button></div>';
+    var title = '<h2>' + day(S.day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</h2>';
+    if (!D || D.day.day !== S.day) return '<div class="dayhead"><div>' + title + '</div>' + nav + '</div><p class="empty">Cargando…</p>';
+    var d = D.day, past = d.day < S.today, now = d.day === S.today ? nowHM() : '', byId = {}, n = { free: 0, booked: 0, hold: 0, closed: 0 };
+    D.bookings.forEach(function (b) { byId[b.id] = b; });
+    d.slots.forEach(function (x) { n[x.state]++; });
+    var sum = [n.booked ? plural(n.booked, 'reserva', 'reservas') : 'Sin reservas'];
+    if (n.hold) sum.push(plural(n.hold, 'pago en curso', 'pagos en curso'));
+    if (!d.closed) { sum.push(plural(n.free, 'hora libre', 'horas libres')); if (n.closed) sum.push(plural(n.closed, 'hora bloqueada', 'horas bloqueadas')); }
+    var h = '<div class="dayhead"><div>' + title + '<p class="daysum">' + (d.closed ? '<b>Día bloqueado' + (d.note ? ': ' + esc(d.note) : '') + '</b> · ' : '') + sum.join(' · ') + '</p></div>' + nav + '</div>' +
+      (d.closed ? '<p class="hint" style="margin:10px 0 0">Nadie puede reservar este día en la web. Las reservas ya confirmadas se mantienen.</p>' : '');
+    if (!d.slots.length) h += '<p class="empty">Este día no tiene horas en su horario. Puede añadir una hora extra aquí abajo o cambiar el horario habitual en la pestaña Horario.</p>';
+    else {
+      var am = d.slots.some(function (x) { return x.time < '15:00'; }), pm = d.slots.some(function (x) { return x.time >= '15:00'; }), part = '';
+      h += '<ul class="slots">';
+      d.slots.forEach(function (x) {
+        var b = x.booking ? byId[x.booking.id] || x.booking : null, who = '', act = '', st, gone = past || (now && x.time < now);
+        var here = x.time < '15:00' ? 'Mañana' : 'Tarde';
+        if (am && pm && here !== part) { part = here; h += '<li class="slotsep">' + here + '</li>'; }
+        if (x.state === 'free') {
+          st = chip('free', x.extra ? 'Libre · hora extra' : 'Libre');
+          act = '<button class="btn btn--sm" data-manual="' + x.time + '">Reservar</button>' +
+            (x.extra && !x.base ? '<button class="btn btn--sm" data-unset="' + x.time + '">Quitar</button>' : '<button class="btn btn--sm" data-close="' + x.time + '">Bloquear</button>');
+        } else if (x.state === 'closed') {
+          st = chip('closed', 'Bloqueada');
+          act = d.closed ? '' : '<button class="btn btn--sm" data-unset="' + x.time + '">Desbloquear</button>';
+        } else {
+          st = chip(x.state === 'hold' ? 'hold' : 'confirmed', x.state === 'hold' ? 'Pago en curso' : 'Confirmada');
+          who = '<b>' + esc(b.name) + '</b> <small>· ' + MODE[b.mode] + (b.phone ? ' · ' + esc(b.phone) : '') + '</small>';
+          act = '<button class="btn btn--sm" data-open="' + b.id + '">Ver</button>';
+        }
+        h += '<li class="slot slot--' + x.state + (gone && x.state !== 'booked' ? ' slot--past' : '') + '"><span class="slot__t num">' + x.time + '</span>' + st + '<span class="slot__who">' + who + '</span><span class="slot__act">' + act + '</span></li>';
+      });
+      h += '</ul>';
+    }
+    h += '<div class="dayact"><form class="addslot" id="f-addslot" style="margin:0"><label for="newtime" class="hint">Añadir una hora extra este día:</label><input id="newtime" name="time" type="time" step="300" required><button class="btn btn--sm" type="submit">Añadir hora</button></form>' +
+      '<span class="spacer"></span>' + (d.closed ? '<button class="btn btn--sm" data-openday>Desbloquear el día</button>' : '<button class="btn btn--sm" data-closeday' + (past ? ' disabled' : '') + '>Bloquear el día entero</button>') + '</div>';
+    var gone2 = D.bookings.filter(function (b) { return b.status === 'cancelled' || b.status === 'refunded'; });
+    if (gone2.length) {
+      h += '<h3>Canceladas este día</h3><ul class="slots">' + gone2.map(function (b) {
+        return '<li class="slot"><span class="slot__t num">' + b.time + '</span>' + chip(b.status, STATUS[b.status]) + '<span class="slot__who"><b>' + esc(b.name) + '</b> <small>· ' + esc(b.ref) + '</small></span><span class="slot__act"><button class="btn btn--sm" data-open="' + b.id + '">Ver</button></span></li>';
+      }).join('') + '</ul>';
+    }
+    return h;
+  }
+
+  function viewAgenda() {
+    app.innerHTML = shell(banner() + '<div class="todaybar" id="todaybar">' + todayBar() + '</div><div class="agenda"><div class="side"><div class="card" id="cal">' + calHTML() + '</div>' +
+      '<div class="card" id="nextc">' + nextHTML() + '</div></div><div class="card" id="dayp">' + dayHTML() + '</div></div>');
+  }
+  function paintAgenda() {
+    var c = $('#cal'), d = $('#dayp'), n = $('#nextc'), t = $('#todaybar');
+    if (c && d && n && t) { c.innerHTML = calHTML(); d.innerHTML = dayHTML(); n.innerHTML = nextHTML(); t.innerHTML = todayBar(); } else viewAgenda();
+  }
+  function loadMonth(m) { m = m || S.month; return api('GET', '/admin/month?month=' + m).then(function (r) { S.months[m] = r.days; }); }
+  function loadDay() { var d = S.day; return api('GET', '/admin/day?day=' + d).then(function (r) { if (d === S.day) S.dayData = r; }); }
+  function loadUpcoming() {
+    return api('GET', '/admin/bookings?from=' + S.today + '&status=active').then(function (r) {
+      var dur = ((S.settings && S.settings.durationMin) || 60) * 60000;
+      S.upcoming = r.bookings.filter(function (b) { return new Date(b.starts_at).getTime() + dur > Date.now(); });
+    });
+  }
+  function refreshAgenda() {
+    var tm = S.today.slice(0, 7);
+    return Promise.all([loadMonth(), loadDay(), loadUpcoming(), tm !== S.month ? loadMonth(tm) : null]).then(function () { if (S.tab === 'agenda') paintAgenda(); });
+  }
+  function goDay(iso) {
+    S.day = iso; S.dayData = null;
+    var m = iso.slice(0, 7), other = m !== S.month; S.month = m;
+    paintAgenda();
+    return Promise.all([other || !S.months[m] ? loadMonth() : null, loadDay()]).then(function () { if (S.tab === 'agenda') paintAgenda(); });
+  }
+
+  /* -------------------------------- Reservas -------------------------------- */
+  function listShown() {
+    var q = S.q.trim().toLowerCase();
+    if (!q) return S.list;
+    return S.list.filter(function (b) { return [b.name, b.phone, b.email, b.ref].join(' ').toLowerCase().indexOf(q) > -1; });
+  }
+  function listHTML() {
+    var shown = listShown(), rows = shown.map(function (b) {
+      var when = b.day === S.today ? 'Hoy' : b.day === plusDays(S.today, 1) ? 'Mañana' : day(b.day, b.day.slice(0, 4) === S.today.slice(0, 4) ? { weekday: 'short', day: 'numeric', month: 'short' } : { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      return '<tr data-open="' + b.id + '" tabindex="0"><td class="num"><b>' + when + '</b><small>' + b.time + ' h</small></td>' +
+        '<td><b>' + esc(b.name) + '</b><small>' + esc(b.phone) + (b.email ? ' · ' + esc(b.email) : '') + '</small></td>' +
+        '<td>' + MODE[b.mode] + '<small>' + esc(b.ref) + '</small></td>' +
+        '<td>' + chip(b.status, STATUS[b.status]) + (b.flag === 'conflict_refund' ? '<small>Pago tardío devuelto</small>' : '') + '</td>' +
+        '<td class="num">' + money(b.amount_cents) + '<small>' + payText(b) + '</small></td></tr>';
+    }).join('');
+    return rows ? '<div class="tablewrap"><table class="blist"><thead><tr><th>Fecha</th><th>Cliente</th><th>Modalidad</th><th>Estado</th><th>Importe</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+      : '<p class="empty">' + (S.q.trim() ? 'Ninguna reserva coincide con «' + esc(S.q.trim()) + '».' : 'No hay reservas en este periodo.') + '</p>';
+  }
+  function listCount() { var n = listShown().length; return plural(n, 'reserva', 'reservas') + (S.q.trim() && n !== S.list.length ? ' de ' + S.list.length : ''); }
+  function viewList() {
+    var f = [['proximas', 'Próximas'], ['pasadas', 'Pasadas'], ['todas', 'Todas']];
+    app.innerHTML = shell(banner() + '<div class="card"><div class="toolbar"><div class="seg" role="group" aria-label="Periodo">' + f.map(function (x) {
+      return '<button data-filter="' + x[0] + '" aria-pressed="' + (S.filter === x[0]) + '">' + x[1] + '</button>';
+    }).join('') + '</div><input type="search" id="list-q" placeholder="Buscar por nombre, teléfono o referencia" aria-label="Buscar reservas" value="' + esc(S.q) + '">' +
+      '<span class="hint" id="list-n">' + listCount() + '</span><span class="spacer"></span><button class="btn btn--solid" data-manual="">Nueva reserva</button></div>' +
+      '<div id="list-box">' + listHTML() + '</div></div>');
+  }
+  function loadList() {
+    var q = S.filter === 'proximas' ? '?from=' + S.today : S.filter === 'pasadas' ? '?to=' + S.today : '';
+    return api('GET', '/admin/bookings' + q).then(function (r) {
+      S.list = S.filter === 'pasadas' ? r.bookings.reverse() : r.bookings;
+    });
+  }
+
+  /* ------------------------- Comisión de la pasarela ------------------------- */
+  // Estimación para fijar precios. La tarifa es editable porque Stripe la cambia y depende de la tarjeta.
+  function feeState() {
+    if (!S.fee) {
+      S.fee = { net: '', pct: '1.5', fix: '0.25' };
+      try { var saved = JSON.parse(window.localStorage.getItem('ia-fee') || 'null'); if (saved && saved.pct != null && saved.fix != null) { S.fee.pct = String(saved.pct); S.fee.fix = String(saved.fix); } } catch (e) {}
+    }
+    return S.fee;
+  }
+  function num(v) { var n = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isFinite(n) ? n : NaN; }
+  function feeRate() {
+    var f = feeState(), pct = num(f.pct), fix = num(f.fix);
+    if (!(pct >= 0 && pct < 50) || !(fix >= 0 && fix < 50)) return null;
+    return { pct: pct, fix: Math.round(fix * 100) };
+  }
+  function feeOf(cents, r) { return Math.round(cents * r.pct / 100 + r.fix); }
+  function grossFor(net, r) {
+    var g = Math.ceil((net + r.fix) / (1 - r.pct / 100));
+    while (g - feeOf(g, r) < net) g++;
+    while (g > 1 && g - 1 - feeOf(g - 1, r) >= net) g--;
+    return g;
+  }
+  function paintFees() {
+    var f = feeState();
+    ['net', 'pct', 'fix'].forEach(function (k) { var el = $('#fee-' + k); if (el) f[k] = el.value; });
+    var r = feeRate();
+    try { if (r) window.localStorage.setItem('ia-fee', JSON.stringify({ pct: f.pct, fix: f.fix })); } catch (e) {}
+    Object.keys(MODE).forEach(function (k) {
+      var line = $('[data-fee-for="' + k + '"]'), inp = $('[data-mode-price="' + k + '"]');
+      if (!line || !inp) return;
+      var c = Math.round(num(inp.value) * 100);
+      line.textContent = r && c >= 50 ? 'Comisión estimada ' + money(feeOf(c, r)) + ' · recibe ' + money(c - feeOf(c, r)) : '';
+    });
+    var out = $('#fee-out');
+    if (!out) return;
+    var net = Math.round(num(f.net) * 100);
+    if (!r) { out.textContent = 'Revise la tarifa: porcentaje y fijo por cobro.'; return; }
+    if (!(net >= 50)) { out.textContent = 'Escriba cuánto quiere recibir por consulta y verá el precio que debe poner.'; return; }
+    var g = grossFor(net, r), up = Math.ceil(g / 100) * 100;
+    out.innerHTML = 'Precio que debe poner: <b>' + money(g) + '</b>. Stripe se queda ' + money(feeOf(g, r)) + ' y recibe ' + money(g - feeOf(g, r)) + '.' +
+      (up !== g ? '<br>Redondeado a <b>' + money(up) + '</b>, recibe ' + money(up - feeOf(up, r)) + '.' : '');
+  }
+
+  /* -------------------------------- Facturas -------------------------------- */
+  function pdfHref(inv) { return '/api/admin/invoice?id=' + inv.id; }
+  function exportHref(year) { return '/api/admin/invoices/export?year=' + year; }
+  function dmy(iso) { return iso ? iso.split('-').reverse().join('/') : ''; }
+  function loadInvoices() { return api('GET', '/admin/invoices' + (S.invYear ? '?year=' + S.invYear : '')).then(function (r) { S.invData = r; S.invYear = r.year; }); }
+  function invState(i) {
+    if (i.kind === 'R') return chip('closed', 'Rectificativa');
+    if (i.rectified_by) return chip('bad', 'Rectificada');
+    return i.paid_on ? chip('ok', 'Cobrada') : chip('warn', 'Pendiente');
+  }
+  var VF = { queued: ['warn', 'En cola'], sending: ['warn', 'En cola'], pending: ['warn', 'Enviada'], ok: ['ok', 'Registrada'], ok_errors: ['warn', 'Con errores'],
+    rejected: ['bad', 'Rechazada'], invalid: ['bad', 'Datos no admitidos'], annulled: ['closed', 'Anulada'] };
+  var DOCS = [['nif', 'NIF o NIE'], ['03', 'Pasaporte'], ['04', 'Doc. de su país'], ['02', 'NIF-IVA europeo'], ['06', 'Otro']];
+  function vfChip(i) { var v = VF[i.vf_state]; return v ? chip(v[0], v[1]) : '<span class="muted">—</span>'; }
+  function vfOn() { return !!(S.invData && S.invData.verifactu && S.invData.verifactu.enabled); }
+  function docFields(rec) {
+    rec = rec || {};
+    return '<div class="row3"><label class="field"><span>NIF o documento</span><input name="taxId" type="text" maxlength="20" autocomplete="off" value="' + esc(rec.taxId || '') + '"></label>' +
+      '<label class="field"><span>Tipo de documento</span><select name="idType">' + DOCS.map(function (o) { return '<option value="' + o[0] + '"' + ((rec.idType || 'nif') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
+      '<label class="field"><span>País, si no es NIF</span><input name="idCountry" type="text" maxlength="2" placeholder="IT" autocomplete="off" value="' + esc(rec.idCountry || '') + '"></label></div>';
+  }
+  function vfBanner(v) {
+    if (!v || !v.enabled) return '';
+    var out = '';
+    if (v.queued) out += '<div class="aeat aeat--warn"><p><b>' + plural(v.queued, 'factura pendiente', 'facturas pendientes') + ' de enviar a la AEAT.</b> No se entregan al cliente hasta quedar registradas. Se reintenta cada hora.</p><button type="button" class="btn btn--sm" data-vf-retry>Reintentar ahora</button></div>';
+    if (v.invalid) out += '<div class="aeat aeat--bad"><p><b>' + plural(v.invalid, 'factura con datos', 'facturas con datos') + ' que la AEAT no admite.</b> No se ha enviado nada. Ábrala para corregirla.</p></div>';
+    if (v.rejected) out += '<div class="aeat aeat--bad"><p><b>' + plural(v.rejected, 'factura rechazada', 'facturas rechazadas') + ' por la AEAT.</b> No es válida: hay que rectificarla y emitirla de nuevo.</p></div>';
+    if (v.okErrors) out += '<div class="aeat aeat--warn"><p><b>' + plural(v.okErrors, 'factura aceptada', 'facturas aceptadas') + ' con errores.</b> Revise el aviso en cada una.</p></div>';
+    if (!out) out = '<div class="aeat"><p>' + (v.mode === 'test' ? 'VERI*FACTU en pruebas: las facturas se envían al entorno de pruebas de la AEAT y no tienen validez fiscal.' : 'VERI*FACTU activo: cada factura se registra en la AEAT al expedirla.') + '</p></div>';
+    else if (v.mode === 'test') out += '<div class="aeat"><p>Entorno de pruebas de la AEAT: nada de lo enviado tiene validez fiscal.</p></div>';
+    return out;
+  }
+  function viewInvoices() {
+    var d = S.invData;
+    if (!d) { app.innerHTML = shell('<div class="card"><h2>Facturas</h2><p class="empty">Cargando…</p></div>'); return; }
+    var years = d.years.map(function (y) { return '<option' + (y === d.year ? ' selected' : '') + '>' + y + '</option>'; }).join('');
+    var tiles = d.quarters.map(function (q) {
+      return '<div class="tile"><span class="tile__k">' + q.q + '.º trimestre</span><b class="num">' + money(q.base) + '</b>' +
+        '<small class="num">IVA ' + money(q.vat) + (q.irpf ? ' · IRPF ' + money(q.irpf) : '') + '</small><small>' + q.count + (q.count === 1 ? ' factura' : ' facturas') + '</small></div>';
+    }).join('');
+    var aeat = vfOn() || d.invoices.some(function (i) { return i.vf_state; });
+    var rows = d.invoices.map(function (i) {
+      return '<tr data-inv="' + i.id + '" tabindex="0"><td class="num"><b>' + esc(i.code) + '</b><small>' + (i.origin === 'web' ? 'Web' + (i.booking_ref ? ' · ' + esc(i.booking_ref) : '') : 'A mano') + '</small></td>' +
+        '<td class="num">' + dmy(i.issued_on) + '</td><td><b>' + esc(i.client || '') + '</b><small>' + esc(i.client_tax || (i.rectifies_code ? 'Rectifica la ' + i.rectifies_code : '')) + '</small></td>' +
+        '<td class="num r">' + money(i.base_cents) + '</td><td class="num r">' + money(i.vat_cents) + '</td><td class="num r">' + (i.irpf_cents ? money(-i.irpf_cents) : '—') + '</td>' +
+        '<td class="num r"><b>' + money(i.total_cents - i.irpf_cents) + '</b></td><td>' + invState(i) + '</td>' + (aeat ? '<td>' + vfChip(i) + '</td>' : '') + '</tr>';
+    }).join('');
+    app.innerHTML = shell('<div class="card"><div class="listhead"><h2>Facturas</h2><select id="inv-year" aria-label="Año">' + years + '</select><span class="spacer"></span>' +
+      '<a class="btn" id="inv-export" href="' + exportHref(d.year) + '">Exportar para la gestoría</a><button class="btn btn--solid" data-newinv>Nueva factura</button></div>' +
+      vfBanner(d.verifactu) + '<div class="tiles">' + tiles + '</div>' +
+      '<p class="invsum num">Año ' + d.year + ': base ' + money(d.totals.base) + ' · IVA ' + money(d.totals.vat) + ' · IRPF retenido ' + money(d.totals.irpf) +
+      (d.pending.count ? ' · <span class="pending">pendiente de cobro ' + money(d.pending.cents) + ' (' + d.pending.count + ')</span>' : '') + '</p>' +
+      (rows ? '<div class="tablewrap"><table><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th class="r">Base</th><th class="r">IVA</th><th class="r">IRPF</th><th class="r">A cobrar</th><th>Estado</th>' + (aeat ? '<th>AEAT</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+        : '<p class="empty">Todavía no hay facturas en ' + d.year + '.</p>') + '</div>');
+  }
+
+  function dlgInvoice(i) {
+    var editable = i.kind === 'F' && i.origin === 'panel' && !i.rectified_by && i.vf_state !== 'invalid';
+    var held = i.vf_state === 'queued' || i.vf_state === 'sending' || i.vf_state === 'invalid' || i.vf_state === 'rejected';
+    var canSimplify = Math.abs(i.total_cents) <= 40000 && !i.irpf_cents;
+    var fix = i.vf_state === 'invalid' && !i.sent_at ? '<hr><form id="f-fix" data-id="' + i.id + '"><p class="hint" style="margin:0 0 12px">No se ha enviado nada a la AEAT ni al cliente. Corrija los datos y se registrará con el mismo número.</p>' +
+      '<label class="field"><span>Cliente, tal como figura en Hacienda</span><input name="name" type="text" maxlength="200" value="' + esc(i.client || '') + '"></label>' +
+      docFields({ taxId: i.client_tax, idType: i.client_id_type, idCountry: i.client_id_country }) +
+      '<label class="field"><span>Domicilio</span><input name="address" type="text" maxlength="300" value="' + esc(i.client_address || '') + '"></label>' +
+      (canSimplify ? '<label class="check"><input type="checkbox" name="simplified"><span>Emitirla como simplificada, sin datos fiscales del cliente</span></label>' : '') +
+      '<p class="err" role="alert"></p><div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button><button class="btn btn--solid" type="submit">Corregir y registrar</button></div></form>' : '';
+    var aeatRow = i.vf_state ? '<dt>AEAT</dt><dd>' + vfChip(i) + (i.vf_env === 'test' ? ' <span class="muted">entorno de pruebas</span>' : '') +
+      (i.vf_state === 'queued' || i.vf_state === 'sending' ? '<p class="hint" style="margin:6px 0 0">Pendiente de envío' + (i.vf_error ? ': ' + esc(i.vf_error) : '') + '. Se reintenta cada hora.</p>' : i.vf_error ? '<p class="vferr">' + esc(i.vf_error) + '</p>' : '') +
+      (!held && /^https:\/\//.test(i.vf_url || '') ? '<span class="invact"><a class="btn btn--sm" href="' + esc(i.vf_url) + '" target="_blank" rel="noopener noreferrer">Comprobar en la AEAT</a></span>' : '') + '</dd>' : '';
+    openDlg('<h2>' + esc(i.code) + '</h2><p class="dlg__sub">' + (i.kind === 'R' ? 'Factura rectificativa' : i.simplified ? 'Factura simplificada' : 'Factura') + ' · ' + day(i.issued_on, { day: 'numeric', month: 'long', year: 'numeric' }) + '</p>' +
+      '<dl class="dl"><dt>Estado</dt><dd>' + invState(i) + (i.paid_on && i.kind === 'F' ? ' <span class="num">el ' + dmy(i.paid_on) + '</span>' : '') + '</dd>' +
+      '<dt>Cliente</dt><dd>' + esc(i.client || '') + (i.client_tax ? ' · ' + esc(i.client_tax) : '') + '</dd>' +
+      (i.concept ? '<dt>Concepto</dt><dd>' + esc(i.concept) + '</dd>' : '') +
+      '<dt>Base</dt><dd class="num">' + money(i.base_cents) + '</dd><dt>IVA ' + String(i.vat_bp / 100).replace('.', ',') + ' %</dt><dd class="num">' + money(i.vat_cents) + '</dd>' +
+      (i.irpf_cents ? '<dt>IRPF ' + String(i.irpf_bp / 100).replace('.', ',') + ' %</dt><dd class="num">' + money(-i.irpf_cents) + '</dd>' : '') +
+      '<dt>A cobrar</dt><dd class="num"><b>' + money(i.total_cents - i.irpf_cents) + '</b></dd>' +
+      '<dt>Origen</dt><dd>' + (i.origin === 'web' ? 'Cobro de la web' + (i.booking_ref ? ' · reserva ' + esc(i.booking_ref) : '') : 'Emitida a mano') + '</dd>' +
+      (i.rectifies_code ? '<dt>Rectifica a</dt><dd class="num">' + esc(i.rectifies_code) + (i.reason ? ' · «' + esc(i.reason) + '»' : '') + '</dd>' : '') +
+      (i.rectified_by ? '<dt>Rectificada por</dt><dd class="num">' + esc(i.rectified_by) + '</dd>' : '') +
+      aeatRow +
+      '<dt>Envío</dt><dd>' + (i.sent_at ? 'Enviada el ' + stamp(i.sent_at) : held ? (i.vf_deliver ? 'Saldrá hacia el cliente al quedar registrada' : 'No se entrega hasta quedar registrada') : i.client_email ? 'Sin enviar' : 'Sin correo del cliente') +
+      '<span class="invact"><a class="btn btn--sm" href="' + pdfHref(i) + '" target="_blank" rel="noopener">Ver PDF</a>' +
+      (i.client_email && !held ? '<button type="button" class="btn btn--sm" data-inv-mail="' + i.id + '">' + (i.sent_at ? 'Reenviar' : 'Enviar') + '</button>' : '') + '</span><p class="err" role="alert" data-inv-err></p></dd></dl>' + fix +
+      (editable ? '<hr><div class="paidrow">' + (i.paid_on
+          ? '<button type="button" class="btn" data-inv-paid="' + i.id + '|">Volver a pendiente</button>'
+          : '<label class="sr" for="paid-on">Fecha de cobro</label><input type="date" id="paid-on" max="' + S.today + '" value="' + S.today + '"><button type="button" class="btn" data-inv-paid="' + i.id + '|set">Marcar como cobrada</button>') + '</div>' +
+        '<hr><form id="f-rect" data-id="' + i.id + '"><label class="field"><span>Motivo de la rectificación</span><input name="reason" type="text" maxlength="200" placeholder="Aparece en la factura rectificativa"></label>' +
+        (vfOn() && !i.simplified ? '<label class="field"><span>Qué ha pasado</span><select name="rectType"><option value="R1">La operación se anula o se devuelve el importe</option><option value="R4">La factura tenía un error</option></select></label>' : '') +
+        (i.client_email ? '<label class="check"><input type="checkbox" name="send" checked><span>Enviar la rectificativa al cliente</span></label>' : '') +
+        '<p class="err" role="alert"></p><div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button><button class="btn btn--danger" type="submit">Rectificar la factura</button></div></form>'
+        : fix ? '' : (i.origin === 'web' && i.kind === 'F' && !i.rectified_by ? '<p class="hint" style="margin-top:14px">Las facturas de la web se rectifican solas al cancelar la reserva con devolución.</p>' : '') +
+          '<div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button></div>'), fix ? 'dlg--wide' : '');
+  }
+
+  function lineHTML() {
+    return '<div class="line"><input type="text" data-l="concept" maxlength="200" aria-label="Concepto" placeholder="Concepto">' +
+      '<input type="number" data-l="qty" min="0.01" step="0.01" value="1" inputmode="decimal" aria-label="Cantidad">' +
+      '<span class="euro"><input type="number" data-l="price" min="0" step="0.01" inputmode="decimal" aria-label="Precio sin IVA"></span>' +
+      '<button type="button" class="btn btn--sm" data-delline aria-label="Quitar línea">×</button></div>';
+  }
+  function dlgNewInvoice() {
+    var cfg = (S.settings && S.settings.invoice) || { vatBp: 2100 };
+    openDlg('<h2>Nueva factura</h2><p class="dlg__sub">Recibe el número siguiente al de la última. Una vez emitida no se cambia ni se borra: se rectifica.</p>' +
+      '<form id="f-inv"><label class="field"><span>Cliente</span><input name="name" type="text" maxlength="200" required autofocus></label>' + docFields() +
+      '<label class="field"><span>Domicilio</span><input name="address" type="text" maxlength="300"></label>' +
+      '<label class="field"><span>Correo del cliente (opcional)</span><input name="email" type="email" maxlength="160"></label>' +
+      '<div class="linehead"><span>Concepto</span><span>Cantidad</span><span>Precio sin IVA</span><span></span></div><div id="inv-lines">' + lineHTML() + '</div>' +
+      '<button type="button" class="btn btn--sm" data-addline>Añadir línea</button>' +
+      (vfOn() ? '<p class="hint" style="margin:10px 0 0">El concepto se comunica a la AEAT con el registro de la factura: descríbalo sin datos del asunto.</p>' : '') +
+      '<div class="row3">' + (vfOn()
+        ? '<label class="field"><span>Fecha de la operación</span><input name="operationOn" type="date" max="' + S.today + '" value="' + S.today + '"><small>La factura lleva la fecha de hoy</small></label>'
+        : '<label class="field"><span>Fecha</span><input name="issuedOn" type="date" max="' + S.today + '" value="' + S.today + '" required></label>') +
+      '<label class="field"><span>IVA (%)</span><input name="vat" type="number" min="0" max="30" step="0.01" value="' + (cfg.vatBp / 100) + '"></label>' +
+      '<label class="field"><span>Retención IRPF</span><select name="irpf"><option value="0">Sin retención</option><option value="7">7 %</option><option value="15">15 %</option></select></label></div>' +
+      '<label class="field"><span>Nota en la factura (opcional)</span><input name="note" type="text" maxlength="400"></label>' +
+      '<label class="check"><input type="checkbox" name="paid"><span>Ya está cobrada</span></label>' +
+      '<label class="check" style="margin-bottom:14px"><input type="checkbox" name="send"><span>Enviarla por correo al cliente al emitirla</span></label>' +
+      '<p class="invtotal num" id="inv-total" aria-live="polite"></p>' +
+      '<p class="err" role="alert"></p><div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button><button class="btn btn--solid" type="submit">Emitir factura</button></div></form>', 'dlg--wide');
+    paintInvTotal();
+  }
+  function invLines() {
+    return Array.prototype.map.call(document.querySelectorAll('#inv-lines .line'), function (row) {
+      var g = function (k) { return row.querySelector('[data-l="' + k + '"]').value.trim(); };
+      return { concept: g('concept'), qty: num(g('qty')), unitCents: Math.round(num(g('price')) * 100) };
+    });
+  }
+  function paintInvTotal() {
+    var out = $('#inv-total'), f = $('#f-inv');
+    if (!out || !f) return;
+    var base = 0;
+    invLines().forEach(function (l) { if (l.qty > 0 && l.unitCents >= 0) base += Math.round(l.qty * l.unitCents); });
+    var vatBp = Math.round(num(f.elements.vat.value) * 100), irpfBp = Math.round(num(f.elements.irpf.value) * 100);
+    if (!(base > 0) || !(vatBp >= 0)) { out.textContent = 'Escriba al menos un concepto con su precio.'; return; }
+    var vat = Math.round(base * vatBp / 10000), irpf = Math.round(base * irpfBp / 10000);
+    out.innerHTML = 'Base ' + money(base) + ' · IVA ' + money(vat) + (irpf ? ' · IRPF ' + money(-irpf) : '') + ' · <b>' + (irpf ? 'A cobrar ' : 'Total ') + money(base + vat - irpf) + '</b>';
+  }
+
+  /* --------------------------------- Horario --------------------------------- */
+  // La agenda guarda horas sueltas; aquí se muestran como tramos «de 9 a 14», que es como se piensa un horario.
+  function mins(t) { var p = t.split(':'); return +p[0] * 60 + +p[1]; }
+  function hhmm(m) { m = Math.min(m, 1439); var h = Math.floor(m / 60), x = m % 60; return (h < 10 ? '0' : '') + h + ':' + (x < 10 ? '0' : '') + x; }
+  function endOf(r) { var e = mins(r.to); return e === 1439 ? 1440 : e; }
+  function toRanges(times, dur) {
+    var out = [];
+    (times || []).slice().sort().forEach(function (t) {
+      var m = mins(t), last = out[out.length - 1];
+      if (last && endOf(last) === m) last.to = hhmm(m + dur); else out.push({ from: t, to: hhmm(m + dur) });
+    });
+    return out;
+  }
+  function slotsOf(ranges, dur) {
+    var out = [];
+    ranges.forEach(function (r) {
+      if (!r.from || !r.to) return;
+      for (var m = mins(r.from), e = endOf(r); m + dur <= e; m += dur) if (out.indexOf(hhmm(m)) < 0) out.push(hhmm(m));
+    });
+    return out.sort();
+  }
+  function rangeError(ranges, dur) {
+    var list = ranges.slice().sort(function (a, b) { return a.from < b.from ? -1 : 1; });
+    for (var i = 0; i < list.length; i++) {
+      var r = list[i];
+      if (!r.from || !r.to) return 'Complete la hora de inicio y la de fin.';
+      if (endOf(r) <= mins(r.from)) return 'La hora de fin debe ser posterior a la de inicio.';
+      if (endOf(r) - mins(r.from) < dur) return 'De ' + r.from + ' a ' + r.to + ' no cabe una consulta de ' + dur + ' minutos.';
+      if (i && endOf(list[i - 1]) > mins(r.from)) return 'Dos tramos se pisan: revise las horas.';
+    }
+    return slotsOf(ranges, dur).length > 24 ? 'Son demasiadas consultas para un día (máximo 24).' : '';
+  }
+  function schedInit() {
+    var s = S.settings, days = {};
+    for (var d = 1; d <= 7; d++) { var r = toRanges(s.schedule[d], s.durationMin); days[d] = { on: r.length > 0, ranges: r }; }
+    S.sched = { dur: s.durationMin, notice: s.minNoticeHours, ahead: s.maxDaysAhead, days: days, dirty: false };
+  }
+  function wkSum(d) {
+    var D = S.sched.days[d], e = rangeError(D.ranges, S.sched.dur);
+    if (e) return '<span class="wk__err">' + e + '</span>';
+    var t = slotsOf(D.ranges, S.sched.dur);
+    return '<b>' + plural(t.length, 'consulta', 'consultas') + '</b> · ' + t.join(' · ');
+  }
+  function wkDayHTML(d) {
+    var D = S.sched.days[d], name = WEEK[d];
+    var h = '<div class="wk__day" data-wk="' + d + '"><label class="sw"><input type="checkbox" data-wk-on="' + d + '"' + (D.on ? ' checked' : '') + '><span>' + name + '</span></label><div>';
+    if (!D.on) return h + '<p class="wk__off">No atiendo</p></div></div>';
+    D.ranges.forEach(function (r, i) {
+      h += '<div class="rng"><span>De</span><input type="time" step="300" value="' + esc(r.from) + '" data-wk-from="' + d + '|' + i + '" aria-label="' + name + ', inicio del tramo ' + (i + 1) + '">' +
+        '<span>a</span><input type="time" step="300" value="' + esc(r.to) + '" data-wk-to="' + d + '|' + i + '" aria-label="' + name + ', fin del tramo ' + (i + 1) + '">' +
+        (D.ranges.length > 1 ? '<button type="button" class="btn btn--sm btn--ghost rng__x" data-wk-del="' + d + '|' + i + '" aria-label="Quitar el tramo ' + (i + 1) + ' del ' + name.toLowerCase() + '" title="Quitar este tramo">×</button>' : '') + '</div>';
+    });
+    return h + (D.ranges.length < 4 ? '<button type="button" class="btn btn--sm" data-wk-add="' + d + '">Añadir otro tramo</button>' : '') +
+      '<p class="wk__sum num" data-wk-sum="' + d + '">' + wkSum(d) + '</p></div></div>';
+  }
+  function rangeLabel(c) {
+    if (c.from === c.to) return day(c.from, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return 'Del ' + day(c.from, { day: 'numeric', month: 'long' }) + ' al ' + day(c.to, { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function closuresHTML() {
+    if (!S.closures.length) return '<p class="hint" style="margin:16px 0 0">No hay días bloqueados a partir de hoy.</p>';
+    return '<ul class="closures">' + S.closures.map(function (c) {
+      return '<li><span><b>' + rangeLabel(c) + '</b><small>' + plural(c.days, 'día', 'días') + (c.note ? ' · ' + esc(c.note) : '') + '</small>' +
+        (c.bookings ? '<small class="keep">' + plural(c.bookings, 'reserva confirmada se mantiene', 'reservas confirmadas se mantienen') + '</small>' : '') + '</span>' +
+        '<button type="button" class="btn btn--sm" data-reopen="' + c.from + '|' + c.to + '">Desbloquear</button></li>';
+    }).join('') + '</ul>';
+  }
+  function exampleText() {
+    var H = S.sched;
+    if (!(H.notice >= 0) || !(H.ahead >= 1)) return '';
+    var first = new Date(Date.now() + H.notice * 3600000), tz = { timeZone: 'Europe/Madrid' };
+    return 'Ahora mismo, en la web se podrían reservar horas desde el ' +
+      new Intl.DateTimeFormat('es-ES', Object.assign({ weekday: 'long', day: 'numeric', month: 'long' }, tz)).format(first) + ' a las ' +
+      new Intl.DateTimeFormat('es-ES', Object.assign({ hour: '2-digit', minute: '2-digit' }, tz)).format(first) +
+      ' h hasta el ' + day(plusDays(S.today, H.ahead), { weekday: 'long', day: 'numeric', month: 'long' }) + '.';
+  }
+  function viewHorario() {
+    var H = S.sched, wk = '';
+    for (var d = 1; d <= 7; d++) wk += wkDayHTML(d);
+    app.innerHTML = shell('<div class="hgrid"><div class="card"><div class="cardhead"><h2>Horario habitual</h2><button type="button" class="btn btn--sm" data-wk-copy>Copiar el lunes de martes a viernes</button></div>' +
+      '<p class="hint" style="margin:-6px 0 14px">Marque los días que atiende e indique de qué hora a qué hora. El panel reparte ese tiempo en consultas de <span id="wk-dur">' + H.dur + '</span> minutos: esas son las horas que se ofrecen en la web. Las reservas ya confirmadas no se tocan.</p>' +
+      '<div class="wk" id="wk">' + wk + '</div></div>' +
+      '<div><div class="card"><h2>Reglas de reserva</h2>' +
+      '<label class="field"><span>Duración de cada consulta (minutos)</span><input type="number" id="h-dur" min="15" max="240" step="5" value="' + H.dur + '"></label>' +
+      '<label class="field"><span>Antelación mínima para reservar en la web (horas)</span><input type="number" id="h-notice" min="0" max="336" value="' + H.notice + '"></label>' +
+      '<label class="field" style="margin-bottom:8px"><span>Con cuántos días de antelación se abre la agenda</span><input type="number" id="h-ahead" min="1" max="365" value="' + H.ahead + '"></label>' +
+      '<p class="hint" id="h-example" style="margin:0">' + exampleText() + '</p></div>' +
+      '<div class="card"><h2>Días libres y vacaciones</h2><p class="hint" style="margin:-6px 0 0">Bloquea días enteros: nadie podrá reservarlos en la web. Se aplica al momento, sin pulsar «Guardar horario».</p>' +
+      '<form class="closeform" id="f-closure"><label class="field"><span>Desde</span><input type="date" name="from" min="' + S.today + '" required></label>' +
+      '<label class="field"><span>Hasta</span><input type="date" name="to" min="' + S.today + '" required></label>' +
+      '<label class="field wide"><span>Motivo (opcional; solo lo ve usted)</span><input type="text" name="note" maxlength="200" placeholder="Vacaciones, señalamiento, festivo…"></label>' +
+      '<p class="err wide" role="alert"></p><div class="wide"><button class="btn" type="submit">Bloquear estos días</button></div></form>' +
+      '<div id="closures">' + closuresHTML() + '</div></div></div></div>' +
+      '<div class="savebar"><span class="err" id="h-err" role="alert"></span><span class="hint" id="h-dirty">' + (H.dirty ? 'Cambios sin guardar' : '') + '</span><button class="btn btn--solid" data-wk-save>Guardar horario</button></div>');
+  }
+  function wkTouch() { S.sched.dirty = true; var x = $('#h-dirty'), e = $('#h-err'); if (x) x.textContent = 'Cambios sin guardar'; if (e) e.textContent = ''; }
+  function wkPaint(d) { var el = $('[data-wk="' + d + '"]'); if (el) el.outerHTML = wkDayHTML(d); }
+  function wkSums() { for (var d = 1; d <= 7; d++) { var el = $('[data-wk-sum="' + d + '"]'); if (el) el.innerHTML = wkSum(d); } }
+  function loadClosures() { return api('GET', '/admin/closures?from=' + S.today).then(function (r) { S.closures = r.closures; }); }
+  function saveHorario(btn) {
+    var H = S.sched, schedule = {}, err = $('#h-err');
+    err.textContent = '';
+    if (!(H.dur >= 15 && H.dur <= 240)) { err.textContent = ERR.bad_duration; return; }
+    for (var d = 1; d <= 7; d++) {
+      var D = H.days[d];
+      if (D.on && rangeError(D.ranges, H.dur)) { err.textContent = 'Revise el horario del ' + WEEK[d].toLowerCase() + '.'; return; }
+      schedule[d] = D.on ? slotsOf(D.ranges, H.dur) : [];
+    }
+    btn.disabled = true;
+    api('PUT', '/admin/settings', { schedule: schedule, durationMin: H.dur, minNoticeHours: H.notice, maxDaysAhead: H.ahead }).then(function (r) {
+      S.settings = r.settings; S.months = {}; schedInit(); toast('Horario guardado'); viewHorario();
+    }, function (e) { btn.disabled = false; err.textContent = errText(e); });
+  }
+  function dlgLeave(go) {
+    openDlg('<h2>Cambios sin guardar</h2><p class="dlg__sub">Ha cambiado el horario y todavía no lo ha guardado.</p>' +
+      '<div class="dlg__act"><button type="button" class="btn" data-leave="' + esc(go) + '">Descartar los cambios</button><button type="button" class="btn btn--solid" data-closedlg>Seguir en Horario</button></div>');
+  }
+
+  /* --------------------------------- Ajustes --------------------------------- */
+  function viewSettings() {
+    var s = S.settings, inv = s.invoice || { enabled: false, series: 'A', vatBp: 2100, copyTo: '', issuer: { name: '', taxId: '', address: '', extra: '', contact: '' } }, modes = Object.keys(MODE).map(function (k) {
+      var m = s.modes[k];
+      return '<div class="mode"><label class="check"><input type="checkbox" data-mode-on="' + k + '"' + (m.enabled ? ' checked' : '') + '><span>' + MODE[k] + '</span></label>' +
+        '<span class="euro"><input type="number" inputmode="decimal" min="0.5" step="0.01" data-mode-price="' + k + '" value="' + (m.priceCents == null ? '' : (m.priceCents / 100)) + '" placeholder="Sin precio" aria-label="Precio de ' + MODE[k] + '"></span></div><p class="fee num" data-fee-for="' + k + '"></p>';
+    }).join('');
+    var vfs = s.verifactu || { enabled: false, producer: { name: '', taxId: '', address: '', contact: '' }, place: '', signedOn: '' };
+    var st = S.stripe === 'live' ? chip('ok', 'Cobros reales activos') : S.stripe === 'test' ? chip('warn', 'Modo de pruebas') : chip('bad', 'Stripe sin conectar');
+    var wh = S.webhook ? chip('ok', 'Aviso de pagos configurado') : chip('bad', 'Falta el aviso de pagos');
+    app.innerHTML = shell('<div class="grid2"><div>' +
+      '<div class="card"><h2>Cobro</h2><div class="statusrow">' + st + wh + '</div>' +
+      '<p class="hint" style="margin:12px 0 0">Las claves de Stripe se guardan en Vercel (<code>STRIPE_SECRET_KEY</code> y <code>STRIPE_WEBHOOK_SECRET</code>), no en este panel. Sin las dos, la web no admite reservas.</p>' +
+      '<h3>Precio por modalidad, IVA incluido</h3><div class="modes">' + modes + '</div><p class="hint" style="margin:10px 0 0">Una modalidad sin precio o desmarcada no se ofrece en la web.</p>' +
+      '<h3>Comisión de Stripe</h3><p class="hint" style="margin:0 0 12px">Stripe descuenta su comisión de cada cobro. No se puede añadir al cliente como recargo por pagar con tarjeta; sí fijar un precio que ya la incluya.</p>' +
+      '<div class="feecalc"><label class="field"><span>Quiero recibir</span><span class="euro"><input type="number" inputmode="decimal" min="0.5" step="0.01" id="fee-net" value="' + esc(feeState().net) + '" placeholder="90"></span></label>' +
+      '<label class="field"><span>Comisión (%)</span><input type="number" inputmode="decimal" min="0" max="20" step="0.01" id="fee-pct" value="' + esc(feeState().pct) + '"></label>' +
+      '<label class="field"><span>Fijo por cobro (€)</span><input type="number" inputmode="decimal" min="0" max="5" step="0.01" id="fee-fix" value="' + esc(feeState().fix) + '"></label></div>' +
+      '<p class="feeout num" id="fee-out" aria-live="polite"></p>' +
+      '<p class="hint" style="margin:10px 0 0">Tarifa de tarjeta europea estándar. Con tarjetas de empresa o de fuera de Europa, Stripe cobra más; si devuelve un pago, no devuelve su comisión.</p></div>' +
+      '<div class="card"><h2>Aviso antes de pagar</h2><p class="hint" style="margin:-6px 0 12px">Se muestra en la web justo antes del pago. El horario y las reglas de reserva están en la pestaña Horario.</p>' +
+      '<label class="field" style="margin-bottom:0"><span>Texto del aviso</span><textarea id="s-policy" maxlength="2000" placeholder="Por ejemplo: plazo para cambiar o cancelar la cita y condiciones de devolución.">' + esc(s.policy) + '</textarea></label></div>' +
+      '<form class="card" id="f-pass"><h2>Mi contraseña</h2><div class="row"><label class="field"><span>Actual</span><input name="current" type="password" autocomplete="current-password" required></label>' +
+      '<label class="field"><span>Nueva</span><input name="next" type="password" autocomplete="new-password" minlength="10" required></label></div><p class="err" role="alert"></p><button class="btn" type="submit">Cambiar contraseña</button></form>' +
+      '<div class="card"><h2>Actividad</h2><p class="hint" style="margin:-6px 0 12px">Registro de quién hizo qué y cuándo en este panel.</p><button type="button" class="btn" data-tab="actividad">Ver la actividad</button></div>' +
+      '</div><div><div class="card"><h2>Facturación</h2><div class="statusrow">' +
+      (inv.enabled ? chip('ok', 'Factura automática activa') : chip('warn', 'Factura automática apagada')) +
+      (S.mail ? chip('ok', 'Correo configurado') : chip('bad', 'Falta configurar el correo')) + '</div>' +
+      '<p class="hint" style="margin:12px 0 14px">Al confirmarse el cobro se expide la factura, numerada sin huecos, y se envía en PDF al cliente. Si se devuelve el importe, se expide la rectificativa. El correo sale de la cuenta guardada en Vercel (<code>SMTP_HOST</code>, <code>SMTP_USER</code>, <code>SMTP_PASS</code>, <code>MAIL_FROM</code>).</p>' +
+      '<label class="check" style="margin-bottom:16px"><input type="checkbox" id="i-on"' + (inv.enabled ? ' checked' : '') + '><span>Enviar factura automática al cobrar</span></label>' +
+      '<div class="row"><label class="field"><span>Nombre o razón social</span><input type="text" id="i-name" maxlength="200" value="' + esc(inv.issuer.name) + '"></label>' +
+      '<label class="field"><span>NIF</span><input type="text" id="i-tax" maxlength="20" autocomplete="off" value="' + esc(inv.issuer.taxId) + '"></label></div>' +
+      '<label class="field"><span>Domicilio fiscal</span><textarea id="i-addr" maxlength="300" rows="2" style="min-height:64px">' + esc(inv.issuer.address) + '</textarea></label>' +
+      '<label class="field"><span>Línea adicional</span><input type="text" id="i-extra" maxlength="200" placeholder="Colegio y número de colegiada" value="' + esc(inv.issuer.extra) + '"></label>' +
+      '<label class="field"><span>Contacto que aparece en la factura</span><input type="text" id="i-contact" maxlength="200" placeholder="Teléfono · correo · web" value="' + esc(inv.issuer.contact) + '"></label>' +
+      '<div class="row"><label class="field"><span>IVA (%)</span><input type="number" id="i-vat" min="0" max="30" step="0.01" value="' + (inv.vatBp / 100) + '"></label>' +
+      '<label class="field"><span>Serie</span><input type="text" id="i-series" maxlength="4" value="' + esc(inv.series) + '"><small>Ejemplo: ' + esc(inv.series) + String(S.today || '').slice(0, 4) + '-0001</small></label></div>' +
+      '<label class="field"><span>Forma de pago en las facturas emitidas a mano</span><input type="text" id="i-pay" maxlength="300" placeholder="Por ejemplo: transferencia a la cuenta…, a 15 días" value="' + esc(inv.payNote || '') + '"></label>' +
+      '<label class="field" style="margin-bottom:0"><span>Enviar copia de cada factura a</span><input type="email" id="i-copy" maxlength="160" placeholder="Correo de la gestoría (opcional)" value="' + esc(inv.copyTo) + '"></label></div>' +
+      '<div class="card"><h2>VERI*FACTU</h2><div class="statusrow">' +
+      (S.vfMode === 'prod' ? chip('ok', 'Clave real') : S.vfMode === 'test' ? chip('warn', 'Clave de pruebas') : chip('bad', 'Sin clave del proveedor')) +
+      (vfs.enabled ? chip('ok', 'Registro en la AEAT activo') : chip('warn', 'Apagado')) +
+      (S.cron ? chip('ok', 'Reintento horario listo') : chip('bad', 'Falta el reintento horario')) + '</div>' +
+      '<p class="hint" style="margin:12px 0 14px">Cada factura se registra en la AEAT antes de salir hacia el cliente y lleva su QR. El envío lo hace Verifacti, colaborador social de la AEAT, con la clave guardada en Vercel (<code>VERIFACTI_API_KEY</code>); el reintento horario necesita <code>CRON_SECRET</code>. Tras la primera factura real ya no se apaga.</p>' +
+      '<label class="check" style="margin-bottom:16px"><input type="checkbox" id="v-on"' + (vfs.enabled ? ' checked' : '') + '><span>Registrar cada factura en la AEAT</span></label>' +
+      '<h3>Declaración responsable del programa</h3><p class="hint" style="margin:0 0 12px">La suscribe quien ha desarrollado este panel, no la abogada. Es obligatoria antes de la primera factura real.</p>' +
+      '<div class="row"><label class="field"><span>Productor: nombre o razón social</span><input type="text" id="v-name" maxlength="200" value="' + esc(vfs.producer.name) + '"></label>' +
+      '<label class="field"><span>NIF del productor</span><input type="text" id="v-tax" maxlength="20" autocomplete="off" value="' + esc(vfs.producer.taxId) + '"></label></div>' +
+      '<label class="field"><span>Dirección postal del productor</span><input type="text" id="v-addr" maxlength="300" value="' + esc(vfs.producer.address) + '"></label>' +
+      '<label class="field"><span>Otras formas de contacto</span><input type="text" id="v-contact" maxlength="200" placeholder="Correo o teléfono" value="' + esc(vfs.producer.contact) + '"></label>' +
+      '<div class="row"><label class="field"><span>Lugar de la firma</span><input type="text" id="v-place" maxlength="80" value="' + esc(vfs.place) + '"></label>' +
+      '<label class="field"><span>Fecha de la firma</span><input type="date" id="v-signed" max="' + S.today + '" value="' + esc(vfs.signedOn) + '"></label></div>' +
+      '<button type="button" class="btn" data-decl>Ver la declaración</button></div>' +
+      '</div></div>' +
+      '<div class="savebar"><span class="err" id="s-err" role="alert"></span><button class="btn btn--solid" data-save>Guardar ajustes</button></div>');
+    paintFees();
+  }
+  function loadSettings() { return api('GET', '/admin/settings').then(function (r) { S.settings = r.settings; S.stripe = r.stripe; S.webhook = r.webhook; S.mail = r.mail; S.vfMode = r.verifactu; S.cron = r.cron; }); }
+  function collectSettings() {
+    var s = S.settings, modes = {};
+    Object.keys(MODE).forEach(function (k) {
+      var v = $('[data-mode-price="' + k + '"]').value.replace(',', '.').trim();
+      modes[k] = { enabled: $('[data-mode-on="' + k + '"]').checked, priceCents: v === '' ? null : Math.round(parseFloat(v) * 100) };
+    });
+    var val = function (id) { var el = $(id); return el ? el.value.trim() : ''; };
+    return { modes: modes, policy: $('#s-policy').value,
+      invoice: { enabled: !!($('#i-on') && $('#i-on').checked), series: val('#i-series').toUpperCase(), vatBp: Math.round(parseFloat(val('#i-vat').replace(',', '.')) * 100), copyTo: val('#i-copy'), payNote: val('#i-pay'),
+        issuer: { name: val('#i-name'), taxId: val('#i-tax'), address: val('#i-addr'), extra: val('#i-extra'), contact: val('#i-contact') } },
+      verifactu: { enabled: !!($('#v-on') && $('#v-on').checked), place: val('#v-place'), signedOn: val('#v-signed'),
+        producer: { name: val('#v-name'), taxId: val('#v-tax'), address: val('#v-addr'), contact: val('#v-contact') } } };
+  }
+  function dlgDeclaration(d) {
+    var p = d.producer || {}, c = d.provider;
+    var comp = c ? esc(c.name) + ' (código ' + esc(c.id) + ', versión ' + esc(c.version) + ')' : 'la API de Verifacti';
+    var row = function (k, title, text) { return '<dt>' + k + '</dt><dd><b>' + title + '</b>' + text + '</dd>'; };
+    var blank = '<span class="muted">Pendiente</span>';
+    openDlg('<div class="decl"><h2>Declaración responsable del sistema informático de facturación</h2>' +
+      (d.complete ? '' : '<p class="draft">Borrador. Faltan datos del productor, el lugar o la fecha de la firma: complételos en Ajustes y guarde.</p>') +
+      '<h3>1. Declaración responsable</h3><dl>' +
+      row('1.a', 'Nombre del sistema informático', esc(d.system.name)) +
+      row('1.b', 'Código identificador del sistema', esc(d.system.code)) +
+      row('1.c', 'Identificador completo de la versión', esc(d.system.version)) +
+      row('1.d', 'Componentes y funcionalidades', 'Aplicación web alojada en la nube, formada por funciones de servidor y una base de datos PostgreSQL. Expide facturas completas, simplificadas y rectificativas, las numera de forma correlativa por serie, genera su PDF y lleva el libro de facturas expedidas. La generación del registro de facturación, su huella y su encadenamiento, la remisión a la Agencia Tributaria y el contenido del código QR corresponden al componente externo ' + comp + ', de Bilbabit, S. L. (Verifacti), que dispone de su propia declaración responsable' + (c && /^https:\/\//.test(c.url) ? ': <a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer">' + esc(c.url) + '</a>' : '') + '.') +
+      row('1.e', '¿Solo puede funcionar como «VERI*FACTU»?', 'Sí.') +
+      row('1.f', '¿Permite ser usado por varios obligados tributarios?', 'No. Da soporte a la facturación de una única obligada tributaria.') +
+      row('1.g', 'Tipos de firma de los registros', 'No procede: el sistema funciona exclusivamente como «VERI*FACTU».') +
+      row('1.h', 'Nombre y apellidos o razón social de quien produce el sistema', p.name ? esc(p.name) : blank) +
+      row('1.i', 'NIF de quien produce el sistema', p.taxId ? esc(p.taxId) : blank) +
+      row('1.j', 'Dirección postal completa de contacto', p.address ? esc(p.address) : blank) +
+      row('1.k', 'Declaración', 'Quien produce el sistema informático hace constar que este, en la versión indicada, cumple con lo dispuesto en el artículo 29.2.j) de la Ley 58/2003, de 17 de diciembre, General Tributaria; en el Reglamento que establece los requisitos que deben adoptar los sistemas y programas informáticos o electrónicos que soporten los procesos de facturación de empresarios y profesionales, y la estandarización de formatos de los registros de facturación, aprobado por el Real Decreto 1007/2023, de 5 de diciembre; en la Orden HAC/1177/2024, de 17 de octubre; y en la sede electrónica de la Agencia Estatal de Administración Tributaria para todo aquello que complete las especificaciones de dicha orden.') +
+      row('1.l', 'Fecha y lugar', d.place && d.signedOn ? esc(d.place) + ', ' + day(d.signedOn, { day: 'numeric', month: 'long', year: 'numeric' }) : blank) +
+      '</dl><h3>2. Anexo</h3><dl>' +
+      row('2.a', 'Otras formas de contacto', p.contact ? esc(p.contact) : blank) +
+      row('2.b', 'Direcciones de internet', 'Esta declaración se consulta dentro del propio sistema, en Ajustes.') +
+      row('2.c', 'Cómo cumple el sistema las especificaciones', 'Cada factura genera su registro de facturación en el momento de expedirse y se remite de inmediato a la Agencia Tributaria. Ninguna factura se entrega al cliente sin ese registro y sin su código QR. Si la remisión falla, la factura queda en cola, se reintenta al menos una vez cada hora y el sistema muestra cuántas hay pendientes. Las facturas expedidas no se pueden modificar ni borrar: los cambios se hacen con una factura rectificativa, que genera su propio registro. La numeración es correlativa y sin huecos dentro de cada serie.') +
+      '</dl><p class="hint" style="margin-top:16px">Texto preparado según el artículo 15 de la Orden HAC/1177/2024 y el modelo de la Agencia Tributaria. Versión ' + esc(d.system.version) + ': cada cambio en la facturación exige una versión y una declaración nuevas.</p>' +
+      '<div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button><button type="button" class="btn btn--solid" data-print>Imprimir o guardar en PDF</button></div></div>', 'dlg--wide');
+  }
+  /* -------------------------------- Actividad -------------------------------- */
+  function viewAudit() {
+    var rows = S.audit.map(function (e) {
+      var d = e.detail || {}, text = ACTION[e.action] || e.action;
+      if (d.day) text += ' ' + (d.time && d.time !== 'día completo' ? 'las ' + d.time + ' del ' : 'el día ') + day(d.day, { day: 'numeric', month: 'long' });
+      if (d.from && d.to) text += d.from === d.to ? ' el día ' + day(d.from, { day: 'numeric', month: 'long' }) : ' los días del ' + day(d.from, { day: 'numeric', month: 'long' }) + ' al ' + day(d.to, { day: 'numeric', month: 'long' });
+      if (d.was) text += ' (antes: ' + day(d.was.split(' ')[0], { day: 'numeric', month: 'long' }) + ', ' + d.was.split(' ')[1] + ')';
+      if (d.reason) text += ' · «' + d.reason + '»';
+      if (d.code) text += ' ' + d.code + (d.rectifies ? ' (rectifica la ' + d.rectifies + ')' : '');
+      return '<tr><td class="num">' + stamp(e.at) + '</td><td>' + esc(e.actor === 'stripe' ? 'Stripe (automático)' : e.actor === 'sistema' ? 'Automático' : e.actor) + '</td><td>' + esc(text) + '</td><td>' + esc(e.ref || '') + '</td></tr>';
+    }).join('');
+    app.innerHTML = shell('<div class="card"><h2>Actividad</h2><p class="hint" style="margin:-6px 0 14px">Quién hizo qué y cuándo. Últimos 200 movimientos.</p>' +
+      (rows ? '<div class="tablewrap"><table><thead><tr><th>Cuándo</th><th>Quién</th><th>Qué</th><th>Reserva</th></tr></thead><tbody>' + rows + '</tbody></table></div>' : '<p class="empty">Sin movimientos todavía.</p>') + '</div>');
+  }
+
+  /* --------------------------------- Diálogos --------------------------------- */
+  function openDlg(html, cls) { dlg.innerHTML = '<div class="dlg' + (cls ? ' ' + cls : '') + '">' + html + '</div>'; if (!dlg.open) dlg.showModal(); }
+  function closeDlg() { if (dlg.open) dlg.close(); }
+
+  /* Selector de día y hora: ofrece las horas libres de ese día y deja escribir otra. */
+  function freeTimes(r) { return r ? r.day.slots.filter(function (x) { return x.state === 'free'; }).map(function (x) { return x.time; }) : []; }
+  function timeOptions(times, pick) {
+    var other = !times.length || (pick && times.indexOf(pick) < 0);
+    return times.map(function (t) { return '<option value="' + t + '"' + (t === pick ? ' selected' : '') + '>' + t + ' h</option>'; }).join('') +
+      '<option value="otra"' + (other ? ' selected' : '') + '>Otra hora…</option>';
+  }
+  function pickNote(times, closed) {
+    return closed ? 'Ese día está bloqueado. Si aun así quiere usarlo, elija «Otra hora».'
+      : times.length ? '' : 'Ese día no tiene horas libres en su horario. Con «Otra hora» puede apuntarla igualmente.';
+  }
+  function pickHTML(dayIso, data, pick, min) {
+    var times = freeTimes(data), other = data ? (!times.length || (pick && times.indexOf(pick) < 0)) : false;
+    return '<div data-pick><div class="row"><label class="field"><span>Día</span><input name="day" type="date" value="' + dayIso + '"' + (min ? ' min="' + min + '"' : '') + ' required></label>' +
+      '<label class="field"><span>Hora</span><select name="time"' + (data ? '' : ' disabled') + '>' + (data ? timeOptions(times, pick) : '<option value="">Cargando…</option>') + '</select></label></div>' +
+      '<label class="field" data-pick-other' + (other ? '' : ' hidden') + '><span>Hora exacta</span><input name="other" type="time" step="300" value="' + (other && pick ? pick : '') + '"></label>' +
+      '<p class="hint" data-pick-note style="margin:-4px 0 12px">' + (data ? pickNote(times, data.day.closed) : '') + '</p></div>';
+  }
+  function pickLoad(pick, keep) {
+    var dv = $('[name=day]', pick).value, sel = $('[name=time]', pick);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dv)) return;
+    sel.disabled = true;
+    api('GET', '/admin/day?day=' + dv).then(function (r) {
+      if ($('[name=day]', pick).value !== dv) return;
+      var times = freeTimes(r);
+      sel.innerHTML = timeOptions(times, keep || ''); sel.disabled = false;
+      $('[data-pick-other]', pick).hidden = sel.value !== 'otra';
+      $('[data-pick-note]', pick).textContent = pickNote(times, r.day.closed);
+    }, function () { sel.disabled = false; });
+  }
+  function pickValue(d) { return { day: d.day, time: d.time === 'otra' ? d.other : d.time }; }
+
+  function dlgBooking(b) {
+    S.booking = b;
+    var active = b.status === 'confirmed' || b.status === 'hold', tel = (b.phone || '').replace(/[^\d+]/g, '');
+    openDlg('<h2>' + esc(b.name) + '</h2><p class="dlg__sub">' + day(b.day, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + b.time + ' h · ' + MODE[b.mode] + '</p>' +
+      '<div class="quick">' + chip(b.status, STATUS[b.status]) + (tel ? '<a class="btn btn--sm" href="tel:' + esc(tel) + '">Llamar</a>' : '') +
+      (b.email ? '<a class="btn btn--sm" href="mailto:' + esc(b.email) + '">Escribir un correo</a>' : '') + '</div>' +
+      '<dl class="dl"><dt>Referencia</dt><dd>' + esc(b.ref) + '</dd>' +
+      (b.phone ? '<dt>Teléfono</dt><dd><a href="tel:' + esc(tel) + '">' + esc(b.phone) + '</a></dd>' : '') +
+      (b.email ? '<dt>Correo</dt><dd><a href="mailto:' + esc(b.email) + '">' + esc(b.email) + '</a></dd>' : '') +
+      '<dt>Idioma</dt><dd>' + esc({ es: 'Español', ru: 'Ruso', hy: 'Armenio', it: 'Italiano' }[b.lang] || b.lang) + '</dd>' +
+      '<dt>Importe</dt><dd>' + money(b.amount_cents) + ' · ' + payText(b) + '</dd>' +
+      (b.note ? '<dt>Mensaje</dt><dd>' + esc(b.note) + '</dd>' : '') +
+      '<dt>Origen</dt><dd>' + (b.source === 'web' ? 'Reserva en la web' : 'Añadida a mano') + ' · ' + stamp(b.created_at) + '</dd>' +
+      (b.cancelled_at ? '<dt>Cancelada</dt><dd>' + stamp(b.cancelled_at) + (b.cancelled_by ? ' · ' + esc(b.cancelled_by) : '') + (b.cancel_reason ? ' · «' + esc(b.cancel_reason) + '»' : '') + '</dd>' : '') +
+      (b.flag === 'conflict_refund' ? '<dt>Aviso</dt><dd>El pago llegó con la hora ya ocupada y se devolvió automáticamente.</dd>' : '') +
+      (b.tax_id ? '<dt>NIF</dt><dd>' + esc(b.tax_id) + '</dd>' : '') + (b.bill_address ? '<dt>Domicilio</dt><dd>' + esc(b.bill_address) + '</dd>' : '') +
+      invRow('Factura', b, b.invoice, 'F') + invRow('Rectificativa', b, b.rectification, 'R') + '</dl>' +
+      '<div data-bk-main><div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button>' +
+      (active ? '<span class="spacer"></span>' + (b.status === 'confirmed' ? '<button type="button" class="btn" data-bk-move>Cambiar día u hora</button>' : '') +
+        '<button type="button" class="btn btn--danger" data-bk-cancel>Cancelar la reserva</button>' : '') + '</div></div><div data-bk-panel hidden></div>');
+  }
+  function bkPanel(html) {
+    var main = $('[data-bk-main]', dlg), box = $('[data-bk-panel]', dlg);
+    main.hidden = !!html; box.hidden = !html; box.innerHTML = html || '';
+    if (html) { var f = box.querySelector('input:not([type=checkbox]), select'); if (f) f.focus(); }
+  }
+  function cancelFormHTML(b) {
+    return '<hr><form id="f-cancel" data-id="' + b.id + '"><h3>Cancelar la reserva</h3><label class="field"><span>Motivo de la cancelación (interno)</span><input name="reason" type="text" maxlength="300"></label>' +
+      (b.paid_online ? '<label class="check"><input type="checkbox" name="refund" checked><span>Devolver ' + money(b.amount_cents) + ' al cliente a través de Stripe</span></label>' : '') +
+      '<p class="hint" style="margin:0 0 4px">La hora vuelve a quedar libre. El panel no avisa al cliente.</p><p class="err" role="alert"></p>' +
+      '<div class="dlg__act"><button type="button" class="btn" data-bk-back>Volver</button><button class="btn btn--danger" type="submit">Cancelar la reserva</button></div></form>';
+  }
+  function moveFormHTML(b) {
+    return '<hr><form id="f-move" data-id="' + b.id + '"><h3>Nuevo día y hora</h3>' + pickHTML(b.day > S.today ? b.day : S.today, null, '', S.today) +
+      '<p class="hint" style="margin:0 0 4px">El panel no avisa al cliente del cambio' + (b.invoice ? ', y la factura ya expedida no se modifica: conserva la fecha original' : '') + '.</p><p class="err" role="alert"></p>' +
+      '<div class="dlg__act"><button type="button" class="btn" data-bk-back>Volver</button><button class="btn btn--solid" type="submit">Guardar el cambio</button></div></form>';
+  }
+  function dlgMoved(b, r) {
+    var when = day(r.day, { weekday: 'long', day: 'numeric', month: 'long' }), tel = (b.phone || '').replace(/[^\d+]/g, '');
+    var body = 'Hola, ' + b.name + ':\n\nLe confirmo el cambio de su consulta. La nueva cita es el ' + when + ' a las ' + r.time + ' h (' + MODE[b.mode].toLowerCase() + ').\n\nUn saludo,\n' + S.me.name;
+    openDlg('<h2>Reserva cambiada</h2><p class="dlg__sub">' + esc(b.name) + ' · ' + when + ' · ' + r.time + ' h</p>' +
+      '<p style="margin:0">El cliente no recibe ningún aviso automático. Conviene confirmárselo.</p>' +
+      '<div class="dlg__act">' + (b.email ? '<a class="btn" style="text-decoration:none" href="mailto:' + esc(b.email) + '?subject=' + encodeURIComponent('Cambio de fecha de su consulta') + '&body=' + encodeURIComponent(body) + '">Avisar por correo</a>' : '') +
+      (tel ? '<a class="btn" style="text-decoration:none" href="tel:' + esc(tel) + '">Llamar</a>' : '') + '<button type="button" class="btn btn--solid" data-closedlg>Hecho</button></div>');
+  }
+
+  function invRow(title, b, inv, kind) {
+    if (!inv) {
+      if (kind === 'R' || !b.paid_online || b.status !== 'confirmed') return '';
+      return '<dt>' + title + '</dt><dd>Sin expedir <span class="invact"><button type="button" class="btn btn--sm" data-inv-send="' + b.id + '|F">Expedir y enviar</button></span><p class="err" role="alert" data-inv-err></p></dd>';
+    }
+    return '<dt>' + title + '</dt><dd><b class="num">' + esc(inv.code) + '</b> · ' + money(inv.total_cents) + ' · ' +
+      (inv.sent_at ? 'enviada el ' + stamp(inv.sent_at) : '<span class="pending">pendiente de envío</span>') +
+      '<span class="invact"><a class="btn btn--sm" href="' + pdfHref(inv) + '" target="_blank" rel="noopener">Ver PDF</a>' +
+      '<button type="button" class="btn btn--sm" data-inv-send="' + b.id + '|' + kind + '">' + (inv.sent_at ? 'Reenviar' : 'Enviar') + '</button></span><p class="err" role="alert" data-inv-err></p></dd>';
+  }
+
+  function dlgManual(time) {
+    var data = S.tab === 'agenda' && S.dayData && S.dayData.day.day === S.day ? S.dayData : null, d0 = S.tab === 'agenda' ? S.day : S.today;
+    openDlg('<h2>Nueva reserva</h2><p class="dlg__sub">Para apuntar una consulta acordada por teléfono o en persona. Ocupa la hora sin pasar por el pago de la web.</p>' +
+      '<form id="f-manual">' + pickHTML(d0, data, time || '') +
+      '<label class="field"><span>Nombre del cliente</span><input name="name" type="text" required autofocus></label>' +
+      '<div class="row"><label class="field"><span>Teléfono</span><input name="phone" type="tel"></label><label class="field"><span>Correo (opcional)</span><input name="email" type="email"></label></div>' +
+      '<div class="row"><label class="field"><span>Modalidad</span><select name="mode"><option value="presencial">Presencial</option><option value="video">Videollamada</option><option value="telefono">Teléfono</option></select></label>' +
+      '<label class="field"><span>Cobro</span><select name="payment"><option value="none">Sin cobro registrado</option><option value="manual">Cobrada fuera de la web</option></select></label></div>' +
+      '<label class="field"><span>Importe cobrado (opcional)</span><span class="euro"><input name="amount" type="number" min="0" step="0.01" inputmode="decimal"></span></label>' +
+      '<label class="field"><span>Nota interna (opcional)</span><input name="note" type="text" maxlength="500"></label>' +
+      '<p class="err" role="alert"></p>' +
+      '<div class="dlg__act"><button type="button" class="btn" data-closedlg>Cerrar</button><button class="btn btn--solid" type="submit">Guardar reserva</button></div></form>');
+    if (!data) pickLoad($('[data-pick]', dlg), time || '');
+  }
+
+  /* -------------------------------- Navegación -------------------------------- */
+  function show() {
+    if (S.tab === 'agenda') { viewAgenda(); return refreshAgenda(); }
+    if (S.tab === 'reservas') { viewList(); return loadList().then(function () { if (S.tab === 'reservas') viewList(); }); }
+    if (S.tab === 'facturas') { viewInvoices(); return loadInvoices().then(function () { if (S.tab === 'facturas') viewInvoices(); }); }
+    if (S.tab === 'horario') return Promise.all([loadSettings(), loadClosures()]).then(function () { if (!S.sched || !S.sched.dirty) schedInit(); if (S.tab === 'horario') viewHorario(); });
+    if (S.tab === 'ajustes') return loadSettings().then(function () { if (S.tab === 'ajustes') viewSettings(); });
+    return api('GET', '/admin/audit').then(function (r) { S.audit = r.entries; if (S.tab === 'actividad') viewAudit(); });
+  }
+  function enter() {
+    return api('GET', '/admin/me').then(function (r) {
+      S.me = r.admin; S.today = r.today; S.month = S.month || r.today.slice(0, 7); S.day = S.day || r.today;
+      return loadSettings();
+    }).then(show);
+  }
+  function boot() {
+    fetch('/api/setup-status').then(function (r) { return r.json(); }).then(function (s) {
+      S.status = s;
+      if (!s.db || !s.sessionSecret || !s.hasAccounts) return viewGate();
+      return enter().catch(function (e) { if (e.status === 401) viewLogin(); else throw e; });
+    }).catch(function () {
+      app.innerHTML = '<div class="wrap"><div class="center"><h1>Panel no disponible</h1><p>No hay conexión con el servidor. Recargue la página en unos minutos.</p></div></div>';
+    });
+  }
+
+  /* ---------------------------------- Eventos ---------------------------------- */
+  function vfToast(r) {
+    if (r.vf === 'queued' || r.vf === 'sending') return ' emitida. Pendiente de envío a la AEAT';
+    if (r.vf === 'invalid') return ' emitida, pero la AEAT no admite los datos: ábrala para corregirla';
+    return (r.vf ? ' emitida y registrada en la AEAT' : ' emitida') + (r.sent ? '; enviada al cliente' : '');
+  }
+  function formData(f) { var o = {}; Array.prototype.forEach.call(f.elements, function (el) { if (el.name) o[el.name] = el.type === 'checkbox' ? el.checked : el.value.trim(); }); return o; }
+  function fail(form, e) { var p = $('.err', form); if (p) p.textContent = errText(e); }
+
+  document.addEventListener('input', function (ev) {
+    if (S.tab === 'ajustes' && ev.target.closest && ev.target.closest('[data-mode-price], #fee-net, #fee-pct, #fee-fix')) paintFees();
+    if (ev.target.closest && ev.target.closest('#f-inv')) paintInvTotal();
+    if (ev.target.id === 'list-q') { S.q = ev.target.value; $('#list-box').innerHTML = listHTML(); $('#list-n').textContent = listCount(); }
+    if (S.tab === 'horario' && S.sched && /^h-(dur|notice|ahead)$/.test(ev.target.id)) {
+      var v = parseInt(ev.target.value, 10), H = S.sched;
+      if (ev.target.id === 'h-dur') { H.dur = v; if (v >= 15 && v <= 240) { $('#wk-dur').textContent = v; wkSums(); } }
+      else if (ev.target.id === 'h-notice') H.notice = v; else H.ahead = v;
+      $('#h-example').textContent = exampleText(); wkTouch();
+    }
+  });
+  document.addEventListener('submit', function (ev) {
+    var f = ev.target; ev.preventDefault();
+    var btn = $('[type="submit"]', f); if (btn) btn.disabled = true;
+    var done = function () { if (btn) btn.disabled = false; };
+    var d = formData(f), p;
+    if (f.id === 'f-login') p = api('POST', '/admin/login', d).then(function () { return enter(); });
+    else if (f.id === 'f-setup') p = api('POST', '/admin/setup', d).then(function () {
+      return fetch('/api/setup-status').then(function (r) { return r.json(); }).then(function (s) { S.status = s; viewLogin('Cuenta creada. Ya puede entrar.'); });
+    });
+    else if (f.id === 'f-addslot') p = api('POST', '/admin/overrides', { day: S.day, time: d.time, open: true }).then(refreshAgenda).then(function () { toast('Hora añadida'); });
+    else if (f.id === 'f-manual' || f.id === 'f-move') {
+      var pv = pickValue(d);
+      if (!/^\d{2}:\d{2}$/.test(pv.time || '')) { done(); fail(f, { code: 'bad_time' }); return; }
+      if (f.id === 'f-manual') p = api('POST', '/admin/bookings', {
+        day: pv.day, time: pv.time, mode: d.mode, name: d.name, phone: d.phone, email: d.email, note: d.note, payment: d.payment,
+        amountCents: d.amount === '' ? null : Math.round(parseFloat(d.amount.replace(',', '.')) * 100)
+      }).then(function () { closeDlg(); toast('Reserva guardada'); if (S.tab === 'agenda') { S.day = pv.day; S.month = pv.day.slice(0, 7); S.dayData = null; } return show(); });
+      else p = api('POST', '/admin/bookings/move', { id: f.getAttribute('data-id'), day: pv.day, time: pv.time }).then(function (r) {
+        var b = S.booking; dlgMoved(b, r);
+        if (S.tab === 'agenda') { S.day = r.day; S.month = r.day.slice(0, 7); S.dayData = null; }
+        return show();
+      });
+    }
+    else if (f.id === 'f-closure') p = api('POST', '/admin/closures', { from: d.from, to: d.to || d.from, note: d.note }).then(function (r) {
+      toast(plural(r.days, 'día bloqueado', 'días bloqueados') + (r.bookings ? '. ' + plural(r.bookings, 'reserva confirmada se mantiene', 'reservas confirmadas se mantienen') : ''));
+      S.months = {}; f.reset();
+      return loadClosures().then(function () { var c = $('#closures'); if (c) c.innerHTML = closuresHTML(); });
+    });
+    else if (f.id === 'f-cancel') p = api('POST', '/admin/bookings/cancel', { id: f.getAttribute('data-id'), refund: d.refund === true, reason: d.reason }).then(function (r) {
+      closeDlg(); toast(r.status === 'refunded' ? 'Reserva cancelada e importe devuelto' : 'Reserva cancelada'); return show();
+    });
+    else if (f.id === 'f-inv') p = api('POST', '/admin/invoices', {
+      recipient: { name: d.name, taxId: d.taxId, address: d.address, email: d.email, idType: d.idType, idCountry: d.idCountry }, lines: invLines(), issuedOn: d.issuedOn, operationOn: d.operationOn,
+      vatBp: Math.round(num(d.vat) * 100), irpfBp: Math.round(num(d.irpf) * 100), note: d.note, paidOn: d.paid === true ? S.today : null, send: d.send === true
+    }).then(function (r) { closeDlg(); toast('Factura ' + r.code + vfToast(r)); return show(); });
+    else if (f.id === 'f-rect') p = api('POST', '/admin/invoices/rectify', { id: f.getAttribute('data-id'), reason: d.reason, send: d.send === true, rectType: d.rectType }).then(function (r) {
+      closeDlg(); toast('Rectificativa ' + r.code + vfToast(r)); return show();
+    });
+    else if (f.id === 'f-fix') p = api('POST', '/admin/invoices/fix', d.simplified === true ? { id: f.getAttribute('data-id'), simplified: true }
+      : { id: f.getAttribute('data-id'), recipient: { name: d.name, taxId: d.taxId, address: d.address, idType: d.idType, idCountry: d.idCountry } }).then(function (r) {
+      closeDlg(); toast('Factura ' + r.code + vfToast(r)); return show();
+    });
+    else if (f.id === 'f-pass') p = api('POST', '/admin/password', d).then(function () { f.reset(); toast('Contraseña cambiada'); });
+    if (p) p.then(done, function (e) { done(); fail(f, e); });
+  });
+
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-inv-send],[data-inv-mail],[data-inv-paid],[data-inv],[data-newinv],[data-addline],[data-delline],[data-tab],[data-logout],[data-month],[data-day],[data-open],[data-manual],[data-close],[data-unset],[data-closeday],[data-openday],[data-filter],[data-closedlg],[data-save],[data-go],[data-vf-retry],[data-decl],[data-print],[data-daystep],[data-today],[data-bk-move],[data-bk-cancel],[data-bk-back],[data-wk-add],[data-wk-del],[data-wk-copy],[data-wk-save],[data-reopen],[data-leave]');
+    if (!t) return;
+    var a = function (n) { return t.getAttribute(n); };
+    var guard = function (p) { return p.catch(function (e) { toast(errText(e)); }); };
+    if (t.hasAttribute('data-go')) { ev.preventDefault(); if (a('data-go') === 'gate') viewGate(); else viewLogin(); return; }
+    if (t.hasAttribute('data-tab')) {
+      if (S.tab === 'horario' && S.sched && S.sched.dirty && a('data-tab') !== 'horario') { dlgLeave(a('data-tab')); return; }
+      S.tab = a('data-tab'); guard(Promise.resolve(show())); return;
+    }
+    if (t.hasAttribute('data-leave')) { S.sched = null; closeDlg(); S.tab = a('data-leave'); guard(Promise.resolve(show())); return; }
+    if (t.hasAttribute('data-daystep')) { guard(goDay(plusDays(S.day, +a('data-daystep')))); return; }
+    if (t.hasAttribute('data-today')) { guard(goDay(S.today)); return; }
+    if (t.hasAttribute('data-bk-cancel')) { bkPanel(cancelFormHTML(S.booking)); return; }
+    if (t.hasAttribute('data-bk-move')) { bkPanel(moveFormHTML(S.booking)); pickLoad($('[data-pick]', dlg), ''); return; }
+    if (t.hasAttribute('data-bk-back')) { bkPanel(''); return; }
+    if (t.hasAttribute('data-wk-add') || t.hasAttribute('data-wk-del') || t.hasAttribute('data-wk-copy')) {
+      var H = S.sched;
+      if (t.hasAttribute('data-wk-add')) {
+        var D = H.days[a('data-wk-add')], last = D.ranges[D.ranges.length - 1], from = Math.min(endOf(last) + 120, 1380), to = Math.min(from + Math.max(H.dur, 60) * 3, 1439);
+        D.ranges.push({ from: hhmm(from), to: hhmm(to) }); wkPaint(a('data-wk-add'));
+      } else if (t.hasAttribute('data-wk-del')) {
+        var w = a('data-wk-del').split('|'); H.days[w[0]].ranges.splice(+w[1], 1); wkPaint(w[0]);
+      } else {
+        for (var c = 2; c <= 5; c++) { H.days[c] = { on: H.days[1].on, ranges: H.days[1].ranges.map(function (r) { return { from: r.from, to: r.to }; }) }; wkPaint(c); }
+        toast('Horario del lunes copiado de martes a viernes');
+      }
+      wkTouch(); return;
+    }
+    if (t.hasAttribute('data-wk-save')) { saveHorario(t); return; }
+    if (t.hasAttribute('data-reopen')) {
+      var rg = a('data-reopen').split('|'); t.disabled = true;
+      guard(api('POST', '/admin/closures/open', { from: rg[0], to: rg[1] }).then(function () {
+        S.months = {}; toast('Días desbloqueados');
+        return loadClosures().then(function () { var c = $('#closures'); if (c) c.innerHTML = closuresHTML(); });
+      }, function (e) { t.disabled = false; throw e; }));
+      return;
+    }
+    if (t.hasAttribute('data-logout')) { api('POST', '/admin/logout').then(function () { S.me = null; viewLogin(); }); return; }
+    if (t.hasAttribute('data-month')) { S.month = addMonths(S.month, +a('data-month')); guard(loadMonth().then(function () { $('#cal').innerHTML = calHTML(); })); return; }
+    if (t.hasAttribute('data-day')) { guard(goDay(a('data-day'))); return; }
+    if (t.hasAttribute('data-filter')) { S.filter = a('data-filter'); guard(loadList().then(viewList)); return; }
+    if (t.hasAttribute('data-closedlg')) { closeDlg(); return; }
+    if (t.hasAttribute('data-manual')) { dlgManual(a('data-manual')); return; }
+    if (t.hasAttribute('data-newinv')) { (S.settings ? Promise.resolve() : loadSettings()).then(dlgNewInvoice); return; }
+    if (t.hasAttribute('data-vf-retry')) {
+      t.disabled = true;
+      guard(api('POST', '/admin/verifactu/retry').then(function (r) { toast(r.registered ? plural(r.registered, 'factura registrada', 'facturas registradas') : r.stopped ? 'El proveedor sigue sin responder' : 'No quedaba nada pendiente'); return show(); }, function (e) { t.disabled = false; throw e; }));
+      return;
+    }
+    if (t.hasAttribute('data-decl')) {
+      t.disabled = true;   // muestra lo guardado: los cambios del formulario cuentan cuando se guardan
+      guard(api('GET', '/admin/verifactu/declaration').then(function (r) { t.disabled = false; dlgDeclaration(r); }, function (e) { t.disabled = false; throw e; }));
+      return;
+    }
+    if (t.hasAttribute('data-print')) { window.print(); return; }
+    if (t.hasAttribute('data-addline')) {
+      var box = $('#inv-lines');
+      if (box.children.length < 12) { box.insertAdjacentHTML('beforeend', lineHTML()); box.lastElementChild.querySelector('input').focus(); }
+      return;
+    }
+    if (t.hasAttribute('data-delline')) { if ($('#inv-lines').children.length > 1) { t.closest('.line').remove(); paintInvTotal(); } return; }
+    if (t.hasAttribute('data-inv-mail')) {
+      var merr = t.closest('dd').querySelector('[data-inv-err]'); t.disabled = true; merr.textContent = '';
+      api('POST', '/admin/invoices/send', { invoiceId: a('data-inv-mail') }).then(function (r) { closeDlg(); toast('Factura ' + r.code + ' enviada'); return show(); },
+        function (e) { t.disabled = false; merr.textContent = errText(e); });
+      return;
+    }
+    if (t.hasAttribute('data-inv-paid')) {
+      var pv = a('data-inv-paid').split('|');
+      guard(api('POST', '/admin/invoices/paid', { id: pv[0], paidOn: pv[1] ? $('#paid-on').value : null }).then(function (r) {
+        closeDlg(); toast(r.paid_on ? 'Factura ' + r.code + ' cobrada' : 'Factura ' + r.code + ' pendiente'); return show();
+      }));
+      return;
+    }
+    if (t.hasAttribute('data-inv')) {
+      var one = (S.invData ? S.invData.invoices : []).filter(function (x) { return x.id === a('data-inv'); })[0];
+      if (one) dlgInvoice(one);
+      return;
+    }
+    if (t.hasAttribute('data-inv-send')) {
+      var iv = a('data-inv-send').split('|'), box = t.closest('dd'), ierr = box && box.querySelector('[data-inv-err]');
+      t.disabled = true; if (ierr) ierr.textContent = '';
+      api('POST', '/admin/invoices/send', { bookingId: iv[0], kind: iv[1] }).then(function (r) {
+        closeDlg(); toast('Factura ' + r.code + ' enviada'); return show();
+      }, function (e) { t.disabled = false; if (ierr) ierr.textContent = errText(e); });
+      return;
+    }
+    if (t.hasAttribute('data-open')) {
+      var id = a('data-open'), b = (S.list.concat(S.dayData ? S.dayData.bookings : [], S.upcoming || [])).filter(function (x) { return x.id === id; })[0];
+      if (b) dlgBooking(b);
+      return;
+    }
+    if (t.hasAttribute('data-close')) { guard(api('POST', '/admin/overrides', { day: S.day, time: a('data-close'), open: false }).then(refreshAgenda).then(function () { toast('Hora bloqueada'); })); return; }
+    if (t.hasAttribute('data-unset')) { guard(api('POST', '/admin/overrides', { day: S.day, time: a('data-unset'), open: null }).then(refreshAgenda).then(function () { toast('Hecho'); })); return; }
+    if (t.hasAttribute('data-closeday')) { guard(api('POST', '/admin/overrides', { day: S.day, time: '', open: false }).then(refreshAgenda).then(function () { toast('Día bloqueado'); })); return; }
+    if (t.hasAttribute('data-openday')) { guard(api('POST', '/admin/overrides', { day: S.day, time: '', open: null }).then(refreshAgenda).then(function () { toast('Día desbloqueado'); })); return; }
+    if (t.hasAttribute('data-save')) {
+      var body = collectSettings(), err = $('#s-err'); err.textContent = '';
+      t.disabled = true;
+      api('PUT', '/admin/settings', body).then(function (r) { S.settings = r.settings; t.disabled = false; toast('Ajustes guardados'); viewSettings(); },
+        function (e) { t.disabled = false; err.textContent = errText(e); });
+    }
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' && ev.target.matches && ev.target.matches('tr[data-open], tr[data-inv]')) ev.target.click();
+  });
+  document.addEventListener('change', function (ev) {
+    var el = ev.target, pick = el.closest && el.closest('[data-pick]');
+    if (pick && el.name === 'day') pickLoad(pick, '');
+    if (pick && el.name === 'time') { $('[data-pick-other]', pick).hidden = el.value !== 'otra'; if (el.value === 'otra') $('[name=other]', pick).focus(); }
+    if (el.closest && el.closest('#f-closure') && el.name === 'from') { var to = $('#f-closure [name=to]'); to.min = el.value || S.today; if (!to.value || to.value < el.value) to.value = el.value; }
+    if (S.tab === 'horario' && S.sched && el.hasAttribute) {
+      var H = S.sched, k;
+      if (el.hasAttribute('data-wk-on')) {
+        k = el.getAttribute('data-wk-on');
+        H.days[k].on = el.checked;
+        if (el.checked && !H.days[k].ranges.length) H.days[k].ranges = (H.days[1].ranges.length ? H.days[1].ranges : [{ from: '09:00', to: '14:00' }, { from: '16:00', to: '19:00' }]).map(function (r) { return { from: r.from, to: r.to }; });
+        wkPaint(k); wkTouch();
+      } else if (el.hasAttribute('data-wk-from') || el.hasAttribute('data-wk-to')) {
+        var isFrom = el.hasAttribute('data-wk-from'); k = el.getAttribute(isFrom ? 'data-wk-from' : 'data-wk-to').split('|');
+        H.days[k[0]].ranges[+k[1]][isFrom ? 'from' : 'to'] = el.value;
+        $('[data-wk-sum="' + k[0] + '"]').innerHTML = wkSum(k[0]); wkTouch();
+      }
+    }
+    if (ev.target.id === 'inv-year') { S.invYear = ev.target.value; loadInvoices().then(function () { if (S.tab === 'facturas') viewInvoices(); }, function (e) { toast(errText(e)); }); }
+  });
+  dlg.addEventListener('click', function (ev) { if (ev.target === dlg) closeDlg(); });
+  window.addEventListener('beforeunload', function (ev) { if (S.sched && S.sched.dirty) { ev.preventDefault(); ev.returnValue = ''; } });
+
+  boot();
+})();
+</script>
+</body>
+</html>

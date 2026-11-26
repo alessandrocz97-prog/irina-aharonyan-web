@@ -1,0 +1,22 @@
+{
+  "name": "irina-aharonyan-web",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "test": "node test/run.mjs",
+    "dev": "node dev/server.mjs"
+  },
+  "dependencies": {
+    "nodemailer": "^7.0.13",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.13.0",
+    "qrcode": "^1.5.4",
+    "stripe": "^17.0.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.0"
+  }
+}
