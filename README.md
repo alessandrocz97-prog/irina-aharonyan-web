@@ -34,6 +34,8 @@ Los valores secretos se escriben en Vercel (Project → Settings → Environment
 10. **Correo para las facturas.** Cuatro variables con los datos SMTP de la cuenta desde la que saldrán: `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` y `MAIL_FROM` (por ejemplo `Irina Aharonyan <facturas@dominio.es>`); `SMTP_PORT` solo si no es el 465. Mejor una cuenta o una contraseña de aplicación dedicada, no la contraseña personal. Redeploy.
 11. **Facturación.** En Ajustes → Facturación: nombre, NIF, domicilio fiscal, IVA y serie; marcar «Enviar factura automática al cobrar». Mientras esté apagada o falten datos, se cobra y se reserva igual, pero no se expide nada.
 12. **Pasar a real.** Sustituir las dos variables de Stripe por las de modo real (clave `sk_live_…` y el secreto del webhook creado en modo real) y Redeploy.
+**VERI*FACTU está aparcado.** El Real Decreto-ley 43/2026 (BOE de 25 de noviembre de 2026) lleva la obligación al 6 de octubre de 2028. Mientras no exista la variable `VERIFACTI_API_KEY`, el panel no muestra nada de VERI*FACTU y factura sin registro en la AEAT. Los pasos 13 y 14 son para cuando se quiera activar; antes hay que volver a añadir a `vercel.json` la tarea horaria: `"crons": [{ "path": "/api/cron/verifactu", "schedule": "7 * * * *" }]`.
+
 13. **VERI*FACTU en pruebas.** Crear una cuenta gratuita en Verifacti y copiar la clave del NIF de pruebas (`vf_test_…`) a la variable `VERIFACTI_API_KEY`. Añadir `CRON_SECRET` (cadena aleatoria de 16 caracteres o más) para el reintento horario. Redeploy. En Ajustes → VERI*FACTU, marcar «Registrar cada factura en la AEAT» y emitir una factura simplificada, una completa y una rectificativa. Ver la lista de comprobación de más abajo.
 14. **VERI*FACTU en real.** Contratar en Verifacti el NIF de la abogada en producción; ella firma el modelo de representación que autoriza a Verifacti a remitir en su nombre. Completar y guardar en el panel la declaración responsable del programa. Sustituir la clave por la de producción (`vf_prod_…`) y Redeploy.
 
@@ -85,7 +87,7 @@ Mientras la web se sirva desde una dirección `*.vercel.app`, lleva la cabecera 
 
 ## VERI*FACTU
 
-Con la facturación centralizada, este panel es el programa de facturación de la titular y le aplica el Reglamento de sistemas informáticos de facturación (Real Decreto 1007/2023). La titular es autónoma: su fecha de obligación es el 1 de julio de 2027 (Real Decreto-ley 15/2025). El panel cumple en la modalidad VERI*FACTU a través de la API de Verifacti (Bilbabit, S. L.), colaborador social de la AEAT.
+Con la facturación centralizada, este panel es el programa de facturación de la titular y le aplica el Reglamento de sistemas informáticos de facturación (Real Decreto 1007/2023). La fecha de obligación para la titular es el 6 de octubre de 2028 (Real Decreto-ley 43/2026, BOE de 25 de noviembre de 2026; nota informativa de la AEAT de la misma fecha). Hasta entonces el panel factura sin VERI*FACTU y esta parte queda preparada pero apagada. El panel cumple en la modalidad VERI*FACTU a través de la API de Verifacti (Bilbabit, S. L.), colaborador social de la AEAT.
 
 **Reparto.** El panel expide la factura (número, importes, PDF). Verifacti genera el registro de facturación, su huella y su encadenamiento, lo remite a la AEAT con su propio certificado y devuelve la URL del QR. La clave de Verifacti vive solo en Vercel.
 

@@ -1010,7 +1010,7 @@ dialog:has(.dlg--wide) { width: min(680px, calc(100vw - 28px)); }
       '<label class="field"><span>Serie</span><input type="text" id="i-series" maxlength="4" value="' + esc(inv.series) + '"><small>Ejemplo: ' + esc(inv.series) + String(S.today || '').slice(0, 4) + '-0001</small></label></div>' +
       '<label class="field"><span>Forma de pago en las facturas emitidas a mano</span><input type="text" id="i-pay" maxlength="300" placeholder="Por ejemplo: transferencia a la cuenta…, a 15 días" value="' + esc(inv.payNote || '') + '"></label>' +
       '<label class="field" style="margin-bottom:0"><span>Enviar copia de cada factura a</span><input type="email" id="i-copy" maxlength="160" placeholder="Correo de la gestoría (opcional)" value="' + esc(inv.copyTo) + '"></label></div>' +
-      '<div class="card"><h2>VERI*FACTU</h2><div class="statusrow">' +
+      (S.vfMode ? '<div class="card"><h2>VERI*FACTU</h2><div class="statusrow">' +
       (S.vfMode === 'prod' ? chip('ok', 'Clave real') : S.vfMode === 'test' ? chip('warn', 'Clave de pruebas') : chip('bad', 'Sin clave del proveedor')) +
       (vfs.enabled ? chip('ok', 'Registro en la AEAT activo') : chip('warn', 'Apagado')) +
       (S.cron ? chip('ok', 'Reintento horario listo') : chip('bad', 'Falta el reintento horario')) + '</div>' +
@@ -1023,7 +1023,7 @@ dialog:has(.dlg--wide) { width: min(680px, calc(100vw - 28px)); }
       '<label class="field"><span>Otras formas de contacto</span><input type="text" id="v-contact" maxlength="200" placeholder="Correo o teléfono" value="' + esc(vfs.producer.contact) + '"></label>' +
       '<div class="row"><label class="field"><span>Lugar de la firma</span><input type="text" id="v-place" maxlength="80" value="' + esc(vfs.place) + '"></label>' +
       '<label class="field"><span>Fecha de la firma</span><input type="date" id="v-signed" max="' + S.today + '" value="' + esc(vfs.signedOn) + '"></label></div>' +
-      '<button type="button" class="btn" data-decl>Ver la declaración</button></div>' +
+      '<button type="button" class="btn" data-decl>Ver la declaración</button></div>' : '') +
       '</div></div>' +
       '<div class="savebar"><span class="err" id="s-err" role="alert"></span><button class="btn btn--solid" data-save>Guardar ajustes</button></div>');
     paintFees();
@@ -1036,11 +1036,13 @@ dialog:has(.dlg--wide) { width: min(680px, calc(100vw - 28px)); }
       modes[k] = { enabled: $('[data-mode-on="' + k + '"]').checked, priceCents: v === '' ? null : Math.round(parseFloat(v) * 100) };
     });
     var val = function (id) { var el = $(id); return el ? el.value.trim() : ''; };
-    return { modes: modes, policy: $('#s-policy').value,
+    var out = { modes: modes, policy: $('#s-policy').value,
       invoice: { enabled: !!($('#i-on') && $('#i-on').checked), series: val('#i-series').toUpperCase(), vatBp: Math.round(parseFloat(val('#i-vat').replace(',', '.')) * 100), copyTo: val('#i-copy'), payNote: val('#i-pay'),
-        issuer: { name: val('#i-name'), taxId: val('#i-tax'), address: val('#i-addr'), extra: val('#i-extra'), contact: val('#i-contact') } },
-      verifactu: { enabled: !!($('#v-on') && $('#v-on').checked), place: val('#v-place'), signedOn: val('#v-signed'),
-        producer: { name: val('#v-name'), taxId: val('#v-tax'), address: val('#v-addr'), contact: val('#v-contact') } } };
+        issuer: { name: val('#i-name'), taxId: val('#i-tax'), address: val('#i-addr'), extra: val('#i-extra'), contact: val('#i-contact') } } };
+    // Sin clave del proveedor la tarjeta de VERI*FACTU no se muestra y sus datos no se tocan
+    if ($('#v-on')) out.verifactu = { enabled: $('#v-on').checked, place: val('#v-place'), signedOn: val('#v-signed'),
+      producer: { name: val('#v-name'), taxId: val('#v-tax'), address: val('#v-addr'), contact: val('#v-contact') } };
+    return out;
   }
   function dlgDeclaration(d) {
     var p = d.producer || {}, c = d.provider;
